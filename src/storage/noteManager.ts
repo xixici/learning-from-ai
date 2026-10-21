@@ -61,16 +61,67 @@ export class NoteManager {
     await vscode.window.showTextDocument(doc, { preview: false });
   }
 
+  public static formatWorkSummaryForClipboard(digest: DailyDigest): string {
+    const ws = digest.workSummary;
+    const lines: string[] = [
+      `### 📋 工作交付与 Standup (${digest.date})`,
+    ];
+
+    if (ws?.title) {
+      lines.push(`**重点概述**：${ws.title}`);
+    } else {
+      lines.push(`**重点概述**：${digest.summary}`);
+    }
+
+    lines.push(``);
+    lines.push(`**今日核心交付成果**：`);
+    if (ws?.deliverables && ws.deliverables.length > 0) {
+      ws.deliverables.forEach((item) => {
+        lines.push(`- [x] ${item}`);
+      });
+    } else {
+      lines.push(`- [x] ${digest.summary}`);
+    }
+
+    if (ws?.changedModules && ws.changedModules.length > 0) {
+      lines.push(``);
+      lines.push(`**涉及核心模块**：${ws.changedModules.map((m) => `\`${m}\``).join(', ')}`);
+    }
+
+    return lines.join('\n');
+  }
+
   private static formatDigestToMarkdown(digest: DailyDigest): string {
     const lines: string[] = [
-      `# 🧠 LFAI 每日代码学习复盘 (${digest.date})`,
+      `# 🧠 LFAI 每日代码复盘与工作交付 (${digest.date})`,
       ``,
-      `> **当日总结**：${digest.summary}`,
+      `> **技术内参提要**：${digest.summary}`,
       `> **提炼卡片数**：${digest.totalCards} 张 | **生成时间**：${new Date().toLocaleTimeString()}`,
       ``,
-      `---`,
-      ``,
     ];
+
+    // 1. Work Deliverables Layer (对公可汇报)
+    if (digest.workSummary) {
+      lines.push(`## 📋 今日工作交付 (Standup / PR Ready)`);
+      lines.push(``);
+      lines.push(`**交付亮点**：${digest.workSummary.title}`);
+      lines.push(``);
+      lines.push(`**完成事项清单**：`);
+      digest.workSummary.deliverables.forEach((item) => {
+        lines.push(`- [x] ${item}`);
+      });
+      if (digest.workSummary.changedModules && digest.workSummary.changedModules.length > 0) {
+        lines.push(``);
+        lines.push(`*涉及模块：${digest.workSummary.changedModules.map((m) => `\`${m}\``).join(', ')}*`);
+      }
+      lines.push(``);
+      lines.push(`---`);
+      lines.push(``);
+    }
+
+    // 2. Deep Tech Insights Layer (对私技术资产)
+    lines.push(`## 🧠 核心技术内参与深度复盘`);
+    lines.push(``);
 
     const categoryIcons: Record<string, string> = {
       syntax: '💡 [语法与特性]',
@@ -81,10 +132,22 @@ export class NoteManager {
 
     digest.cards.forEach((card, index) => {
       const icon = categoryIcons[card.type] || '📌 [知识点]';
-      lines.push(`## ${index + 1}. ${icon} ${card.title}`);
+      lines.push(`### ${index + 1}. ${icon} ${card.title}`);
       lines.push(``);
       lines.push(`**核心要点**：${card.summary}`);
       lines.push(``);
+
+      if (card.theWhy) {
+        lines.push(`> [!NOTE] 💡 机制剖析 (The Why)`);
+        lines.push(`> ${card.theWhy}`);
+        lines.push(``);
+      }
+
+      if (card.destructiveTest) {
+        lines.push(`> [!WARNING] ⚠️ 破坏性推演 (如果不加会怎样)`);
+        lines.push(`> ${card.destructiveTest}`);
+        lines.push(``);
+      }
 
       if (card.codeSnippet) {
         lines.push('```ts');
@@ -93,9 +156,15 @@ export class NoteManager {
         lines.push(``);
       }
 
-      lines.push(`### 深度剖析与最佳实践`);
+      lines.push(`#### 深度底层机制`);
       lines.push(card.explanation);
       lines.push(``);
+
+      if (card.bestPractice) {
+        lines.push(`> [!TIP] ✨ 架构最佳实践`);
+        lines.push(`> ${card.bestPractice}`);
+        lines.push(``);
+      }
 
       if (card.quiz) {
         lines.push(`> [!IMPORTANT] 💡 思考自测题`);
@@ -123,7 +192,7 @@ export class NoteManager {
       lines.push(``);
     });
 
-    lines.push(`*由 [Learning From AI (LFAI)](https://github.com/lfai/learning-from-ai) 自动提炼生成*`);
+    lines.push(`*由 [Learning From AI (LFAI)](https://github.com/xixici/learning-from-ai) 自动提炼生成*`);
     return lines.join('\n');
   }
 }

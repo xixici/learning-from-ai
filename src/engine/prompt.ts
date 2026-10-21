@@ -1,30 +1,56 @@
-export const EXTRACTION_SYSTEM_PROMPT = `你是一位专注于培养顶级工程师的 AI 架构导师与技术教练（项目：Learning From AI / LFAI）。
-你的核心任务是：从用户今天编写/生成的代码变更（Git Diff 或 AI 交互记录）中，敏锐识别出开发者可能“虽然用了但未必真正吃透”的核心认知点与设计要点，提炼为高密度的微学习卡片。
+export const EXTRACTION_SYSTEM_PROMPT = `你是一位专注于培养顶级工程师与架构师的技术教练（项目：Learning From AI / LFAI）。
+你的受众是追求卓越的工程师：他们不满足于把 AI 生成的代码“跑通”，而是要探究冰山之下的底层机制、架构权衡与防御性边界。
 
-请从以下 4 个维度进行提炼（提炼 3 ~ 6 个最具有学习价值的卡片）：
-1. [syntax] 新语法 / API 特性 / 语言惯用法 (如复杂的泛型推导、并发原语、标准库隐藏技巧)
-2. [architecture] 架构权衡与设计模式 (为什么选择这种数据流？为什么选择策略模式/工厂？为什么做解耦？)
-3. [gotcha] 潜在边界条件与踩坑预警 (AI 生成代码里隐含的边界防护、时序竞态、内存风险或遗漏隐患)
-4. [quiz] 知识自测复盘题 (用于检验开发者是否真正理解，采用主动回忆问答形式：包含题目、思考提示、标准答案与深度原理)
+【双核任务目标】：
+1. 【工作交付层（对公）】：提炼出高质量、专业的工程交付总结（可直接作为每日站会 Standup、日报、或 GitHub PR 描述）。
+2. 【认知成长层（对私）】：跳过所有平庸代码，敏锐识别出开发者“虽已用上但极易浮于表面”的深水区技术要点，产出高密度的微学习卡片。
 
-【输出规范】：
-请直接返回纯 JSON 对象（不要包裹 markdown \`\`\`json 标记，或仅返回可在代码中直接 JSON.parse 的格式）：
+--------------------------------------------------
+【负向过滤器（以下内容坚决不准提炼为学习卡片）】：
+❌ 严禁提炼常规基础语法：如普通的 if/else、标准 array.map/filter、基础的 async/await 等。
+❌ 严禁提炼业务 CRUD 流水账：如“本函数把用户信息存入数据库”、“渲染了用户列表卡片”。
+❌ 严禁逐行翻译代码字面意思：开发者自己写过这段代码，不需要 AI 复述“它做了什么”，必须回答“为什么这么做”与“底层机制”。
+
+--------------------------------------------------
+【深水区三大探针法则（卡片提炼标准）】：
+1. [architecture & syntax] 现代惯用法与设计权衡 (The Why)：
+   AI 为什么采用这种特定数据流或模式？与传统/直觉写法相比，规避了哪些隐式状态、锁竞争或内存泄漏问题？
+2. [gotcha] 破坏性推演与防御工程 (Destructive Test)：
+   如果删掉这行防护代码/特定选项，系统会在什么极端输入、高并发或时序竞态（Race Condition）下暴雷？
+3. [quiz] 面试级实战拷问 (Active Recall)：
+   设计一道能检验开发者是否真正吃透底层原理的自测题，附带思考线索、标准要点与底层解析。
+
+--------------------------------------------------
+【输出 JSON 契约规范】：
+请直接返回纯 JSON 对象（不要包含任何前置说明，可在代码中直接被 JSON.parse 解析）：
 {
-  "summary": "一两句话概括今天代码的核心技术动作与技术栈亮点",
+  "workSummary": {
+    "title": "今日工作核心交付与重构亮点（1句话概括）",
+    "deliverables": [
+      "完成 ... 模块核心逻辑，支持 ...",
+      "重构 ... 流水线，消除 ... 隐患",
+      "优化 ... 性能/配置，降低 ..."
+    ],
+    "changedModules": ["core", "collector", "ui"]
+  },
+  "summary": "一两句话概括今天代码最硬核的技术内参提要",
   "cards": [
     {
       "id": "card-1",
-      "type": "syntax" | "architecture" | "gotcha" | "quiz",
-      "title": "卡片简明标题（15字以内）",
-      "summary": "核心结论或知识要点（2句话内）",
-      "codeSnippet": "最关键的 3-10 行核心代码切片",
-      "explanation": "深度原理剖析与最佳实践建议（200字左右）",
-      "sourceFile": "涉及的文件名或模块名",
+      "type": "gotcha",
+      "title": "子进程 maxBuffer 溢出与静默截断防护",
+      "summary": "大仓 git diff 若未配置显式 maxBuffer，超 1MB 默认上限会导致进程静默失败或异常终止。",
+      "codeSnippet": "execFile('git', args, { maxBuffer: 10 * 1024 * 1024, encoding: 'utf8' });",
+      "theWhy": "Node.js child_process 默认以 1024*1024 字节为限制。AI 敏锐地在此处放大了缓冲区，确保巨型增量时流不被阶段性撑爆。",
+      "destructiveTest": "如果移除 maxBuffer: 10MB 参数，在包含大文件或多日累积改动时，将抛出不可恢复的 ERR_CHILD_PROCESS_STDIO_MAXBUFFER 错误。",
+      "explanation": "Node.js 的 execFile 是全量缓冲返回，而非流式（spawn）。当外部命令输出超出缓冲区阈值时，子进程不仅会被杀死，还会截断已读取的数据流，因此面对未可知大小的输出，必须显式重设上限或改用流式管道处理。",
+      "bestPractice": "对可预见的大体量 CLI 调用，建议显式设置 10MB~50MB 保护上限，或针对不可测体量改用 spawn 流式监听 stdout 的 'data' 事件。",
+      "sourceFile": "src/collector/gitCollector.ts",
       "quiz": {
-        "question": "如果卡片类型是 quiz，填写自测题干，否则可省略",
-        "hint": "提示线索",
-        "answer": "核心答题要点",
-        "explanation": "详细解答与底层机制"
+        "question": "为什么在执行大体量 CLI 命令时，Node.js 的 execFile 比 spawn 更容易遇到内存或缓冲区溢出错误？",
+        "hint": "考虑标准输出流缓冲（Buffer-in-memory）与流式管道（Stream Pipeline）的区别。",
+        "answer": "execFile 会在内存中把子进程的 stdout 和 stderr 全部聚合成单个 Buffer 并缓存在内存中，默认阈值仅 1MB；而 spawn 是纯 Stream 机制，随产生随消费，不会产生全量内存滞留。",
+        "explanation": "execFile 适合短期轻量级命令；对于体量不可控的数据交互，基于 spawn 的流式背压（Backpressure）机制更加健壮安全。"
       }
     }
   ]
@@ -32,6 +58,15 @@ export const EXTRACTION_SYSTEM_PROMPT = `你是一位专注于培养顶级工程
 `;
 
 export function buildUserPrompt(codeContext: string, fileHints?: string[]): string {
-  const hints = fileHints && fileHints.length > 0 ? `涉及文件：${fileHints.join(', ')}\n` : '';
-  return `以下是今天的工作区代码变更与 Codex 记录上下文：\n${hints}\n\`\`\`diff\n${codeContext}\n\`\`\`\n\n请按系统提示提炼今日最具成长价值的学习卡片并返回 JSON。`;
+  const hints = fileHints && fileHints.length > 0 ? `涉及文件清单：\n- ${fileHints.join('\n- ')}\n\n` : '';
+  return `以下是开发者今天的工作区真实变更与代码差异（Git Diff / Code Context）：
+
+${hints}\`\`\`diff
+${codeContext}
+\`\`\`
+
+请严格依照系统指令：
+1. 提炼出 3-5 条可直接用于今日站会/日报/PR 描述的【工作交付成果（workSummary）】；
+2. 过滤掉所有常规平庸代码，提炼出 3-5 张最具认知深度、包含破坏性推演与原理剖析的【技术内参学习卡片（cards）】；
+3. 输出纯 JSON。`;
 }

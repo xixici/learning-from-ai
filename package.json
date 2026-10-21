@@ -69,6 +69,12 @@
         "icon": "$(markdown)"
       },
       {
+        "command": "lfai.copyDailyStandup",
+        "title": "复制今日工作交付与 Standup 到剪贴板",
+        "category": "LFAI",
+        "icon": "$(clippy)"
+      },
+      {
         "command": "lfai.refreshSidebar",
         "title": "刷新今日学习看板",
         "category": "LFAI",

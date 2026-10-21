@@ -30,6 +30,9 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
         case 'openNote':
           await vscode.commands.executeCommand('lfai.openTodayNote');
           break;
+        case 'copyStandup':
+          await vscode.commands.executeCommand('lfai.copyDailyStandup');
+          break;
         case 'copyCode':
           await vscode.env.clipboard.writeText(data.code || '');
           vscode.window.showInformationMessage('LFAI: 代码已复制到剪贴板。');
@@ -64,6 +67,7 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
     const todayStr = new Date().toISOString().split('T')[0];
 
     const cardsJson = JSON.stringify(digest?.cards || []);
+    const workSummaryJson = JSON.stringify(digest?.workSummary || null);
     const summaryText = digest?.summary || '暂无提炼数据，点击下方按钮开始分析今日代码。';
     const totalCount = digest?.cards?.length || 0;
 
@@ -137,6 +141,7 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 6px;
+      margin-bottom: 6px;
     }
 
     button {
@@ -163,6 +168,35 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
     }
     button.secondary:hover {
       background: rgba(255, 255, 255, 0.08);
+    }
+
+    /* Work Summary Box */
+    .work-summary-box {
+      background: rgba(0, 122, 204, 0.08);
+      border: 1px solid rgba(0, 122, 204, 0.25);
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 12px;
+    }
+    .work-summary-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      font-size: 12px;
+      user-select: none;
+    }
+    .work-summary-body {
+      margin-top: 8px;
+      font-size: 11px;
+      line-height: 1.5;
+    }
+    .work-summary-list {
+      padding-left: 16px;
+      margin-top: 4px;
+    }
+    .work-summary-list li {
+      margin-bottom: 3px;
     }
 
     .filter-tabs {
@@ -200,32 +234,28 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 6px;
-      padding: 10px;
-      transition: border-color 0.15s ease;
-    }
-    .card:hover {
-      border-color: var(--accent);
+      padding: 12px;
     }
 
     .card-header {
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
       margin-bottom: 6px;
     }
 
     .card-type-tag {
       font-size: 10px;
-      font-weight: bold;
       padding: 2px 6px;
-      border-radius: 10px;
+      border-radius: 3px;
+      font-weight: 600;
       text-transform: uppercase;
     }
 
-    .tag-syntax { background: rgba(78, 201, 176, 0.2); color: var(--badge-syntax); border: 1px solid var(--badge-syntax); }
-    .tag-architecture { background: rgba(86, 156, 214, 0.2); color: var(--badge-arch); border: 1px solid var(--badge-arch); }
-    .tag-gotcha { background: rgba(206, 145, 120, 0.2); color: var(--badge-gotcha); border: 1px solid var(--badge-gotcha); }
-    .tag-quiz { background: rgba(220, 220, 170, 0.2); color: var(--badge-quiz); border: 1px solid var(--badge-quiz); }
+    .tag-syntax { background: rgba(78, 201, 176, 0.15); color: var(--badge-syntax); border: 1px solid var(--badge-syntax); }
+    .tag-architecture { background: rgba(86, 156, 214, 0.15); color: var(--badge-arch); border: 1px solid var(--badge-arch); }
+    .tag-gotcha { background: rgba(206, 145, 120, 0.15); color: var(--badge-gotcha); border: 1px solid var(--badge-gotcha); }
+    .tag-quiz { background: rgba(220, 220, 170, 0.15); color: var(--badge-quiz); border: 1px solid var(--badge-quiz); }
 
     .card-title {
       font-size: 13px;
@@ -274,12 +304,31 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
 
     .deep-dive {
       display: none;
-      margin-top: 6px;
-      padding-top: 6px;
+      margin-top: 8px;
+      padding-top: 8px;
       border-top: 1px dashed var(--card-border);
       font-size: 12px;
-      line-height: 1.4;
-      opacity: 0.9;
+      line-height: 1.45;
+    }
+
+    .deep-dive-section {
+      margin-bottom: 8px;
+      padding: 6px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      line-height: 1.45;
+    }
+    .deep-dive-section.the-why {
+      background: rgba(78, 201, 176, 0.08);
+      border-left: 3px solid var(--badge-syntax);
+    }
+    .deep-dive-section.destructive-test {
+      background: rgba(206, 145, 120, 0.08);
+      border-left: 3px solid var(--badge-gotcha);
+    }
+    .deep-dive-section.best-practice {
+      background: rgba(86, 156, 214, 0.08);
+      border-left: 3px solid var(--badge-arch);
     }
 
     .quiz-box {
@@ -327,21 +376,33 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
 <body>
   <div class="header-box">
     <div class="title-row">
-      <span class="title-main">🧠 LFAI 学习复盘</span>
+      <span class="title-main">🧠 LFAI 学习与交付</span>
       <span class="date-badge">${todayStr} (${totalCount} 张卡片)</span>
     </div>
     <div class="summary-text" id="summaryBox">${summaryText}</div>
     <div class="actions-grid">
       <button id="btnExtract">⚡ 提炼今日考点</button>
-      <button class="secondary" id="btnNote">📝 查看 Markdown</button>
+      <button class="secondary" id="btnStandup">📋 复制日报/PR</button>
+    </div>
+    <button class="secondary" style="width: 100%;" id="btnNote">📝 打开 Markdown 复盘笔记</button>
+  </div>
+
+  <div id="workSummaryBox" class="work-summary-box" style="display: none;">
+    <div class="work-summary-header" id="workSummaryHeader">
+      <span>📋 <b>今日工作交付 (Standup / PR)</b></span>
+      <span id="workSummaryArrow" style="font-size: 10px;">▼</span>
+    </div>
+    <div id="workSummaryBody" class="work-summary-body">
+      <div id="workSummaryTitle" style="font-weight: 600; margin-bottom: 4px; color: var(--accent);"></div>
+      <ul id="workSummaryList" class="work-summary-list"></ul>
     </div>
   </div>
 
   <div class="filter-tabs">
     <button class="tab-btn active" data-filter="all">全部 (${totalCount})</button>
-    <button class="tab-btn" data-filter="syntax">💡 语法</button>
-    <button class="tab-btn" data-filter="architecture">🏗️ 架构</button>
     <button class="tab-btn" data-filter="gotcha">⚠️ 避坑</button>
+    <button class="tab-btn" data-filter="architecture">🏗️ 架构</button>
+    <button class="tab-btn" data-filter="syntax">💡 语法</button>
     <button class="tab-btn" data-filter="quiz">❓ 自测</button>
   </div>
 
@@ -350,14 +411,27 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
   <script>
     const vscode = acquireVsCodeApi();
     let cardsData = ${cardsJson};
+    let workSummaryData = ${workSummaryJson};
     let currentFilter = 'all';
 
     document.getElementById('btnExtract').addEventListener('click', () => {
       vscode.postMessage({ type: 'extractToday' });
     });
 
+    document.getElementById('btnStandup').addEventListener('click', () => {
+      vscode.postMessage({ type: 'copyStandup' });
+    });
+
     document.getElementById('btnNote').addEventListener('click', () => {
       vscode.postMessage({ type: 'openNote' });
+    });
+
+    document.getElementById('workSummaryHeader').addEventListener('click', () => {
+      const body = document.getElementById('workSummaryBody');
+      const arrow = document.getElementById('workSummaryArrow');
+      const isHidden = body.style.display === 'none';
+      body.style.display = isHidden ? 'block' : 'none';
+      arrow.innerText = isHidden ? '▼' : '▲';
     });
 
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -373,10 +447,34 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
       const msg = event.data;
       if (msg.type === 'updateDigest' && msg.digest) {
         cardsData = msg.digest.cards || [];
+        workSummaryData = msg.digest.workSummary || null;
         document.getElementById('summaryBox').innerText = msg.digest.summary || '提炼完成';
+        renderWorkSummary();
         renderCards();
       }
     });
+
+    function renderWorkSummary() {
+      const box = document.getElementById('workSummaryBox');
+      const titleEl = document.getElementById('workSummaryTitle');
+      const listEl = document.getElementById('workSummaryList');
+
+      if (!workSummaryData) {
+        box.style.display = 'none';
+        return;
+      }
+
+      box.style.display = 'block';
+      titleEl.innerText = workSummaryData.title || '今日工作完成摘要';
+      listEl.innerHTML = '';
+
+      const items = workSummaryData.deliverables || [];
+      items.forEach(item => {
+        const li = document.createElement('li');
+        li.innerText = item;
+        listEl.appendChild(li);
+      });
+    }
 
     function renderCards() {
       const container = document.getElementById('cardList');
@@ -423,15 +521,27 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
         if (card.quiz) {
           quizHtml = \`
             <div class="quiz-box">
-              <div class="quiz-q">❓ 自测：\${escapeHtml(card.quiz.question)}</div>
+              <div class="quiz-q">❓ 实战自测：\${escapeHtml(card.quiz.question)}</div>
               \${card.quiz.hint ? \`<div style="font-size:11px; opacity:0.8; margin-bottom:4px;">💡 提示：\${escapeHtml(card.quiz.hint)}</div>\` : ''}
               <button class="quiz-reveal-btn" onclick="toggleQuizAnswer(\${idx})">👉 显示答案与深度解析</button>
               <div class="quiz-answer" id="quiz-ans-\${idx}">
-                <div style="font-weight:600; color:var(--badge-syntax);">【答案】\${escapeHtml(card.quiz.answer)}</div>
-                <div style="margin-top:4px; opacity:0.85;">\${escapeHtml(card.quiz.explanation)}</div>
+                <div style="font-weight:600; color:var(--badge-syntax); margin-bottom:2px;">【核心答案】\${escapeHtml(card.quiz.answer)}</div>
+                <div style="opacity:0.85; line-height:1.4;">\${escapeHtml(card.quiz.explanation)}</div>
               </div>
             </div>
           \`;
+        }
+
+        let deepDiveSections = '';
+        if (card.theWhy) {
+          deepDiveSections += \`<div class="deep-dive-section the-why"><strong>💡 机制剖析 (The Why)：</strong><br/>\${escapeHtml(card.theWhy)}</div>\`;
+        }
+        if (card.destructiveTest) {
+          deepDiveSections += \`<div class="deep-dive-section destructive-test"><strong>⚠️ 破坏性推演 (如果不加会怎样)：</strong><br/>\${escapeHtml(card.destructiveTest)}</div>\`;
+        }
+        deepDiveSections += \`<div class="deep-dive-section"><strong>📖 底层机制详解：</strong><br/>\${escapeHtml(card.explanation)}</div>\`;
+        if (card.bestPractice) {
+          deepDiveSections += \`<div class="deep-dive-section best-practice"><strong>✨ 最佳实践建议：</strong><br/>\${escapeHtml(card.bestPractice)}</div>\`;
         }
 
         cardEl.innerHTML = \`
@@ -442,8 +552,10 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
           <div class="card-title">\${escapeHtml(card.title)}</div>
           <div class="card-summary">\${escapeHtml(card.summary)}</div>
           \${codeHtml}
-          <div class="details-toggle" onclick="toggleDeepDive(\${idx})">📖 展开原理剖析 ▼</div>
-          <div class="deep-dive" id="deep-dive-\${idx}">\${escapeHtml(card.explanation)}</div>
+          <div class="details-toggle" onclick="toggleDeepDive(\${idx})">📖 展开底层原理与破坏性推演 ▼</div>
+          <div class="deep-dive" id="deep-dive-\${idx}">
+            \${deepDiveSections}
+          </div>
           \${quizHtml}
         \`;
 
@@ -482,6 +594,7 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
         .replace(/'/g, '&#039;');
     }
 
+    renderWorkSummary();
     renderCards();
   </script>
 </body>

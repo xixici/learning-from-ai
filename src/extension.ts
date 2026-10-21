@@ -91,12 +91,15 @@ export function activate(context: vscode.ExtensionContext) {
           progress.report({ increment: 10, message: '提炼完成！' });
 
           const action = await vscode.window.showInformationMessage(
-            `🎉 LFAI: 今日成功提炼 ${digest.totalCards} 张学习卡片！`,
+            `🎉 LFAI: 今日成功提炼 ${digest.totalCards} 张高维学习卡片！`,
+            '📋 复制日报/Standup',
             '查看 Markdown 笔记',
             '在侧边栏复习'
           );
 
-          if (action === '查看 Markdown 笔记' && savedPath) {
+          if (action === '📋 复制日报/Standup') {
+            await vscode.commands.executeCommand('lfai.copyDailyStandup');
+          } else if (action === '查看 Markdown 笔记' && savedPath) {
             const doc = await vscode.workspace.openTextDocument(savedPath);
             await vscode.window.showTextDocument(doc, { preview: false });
           } else if (action === '在侧边栏复习') {
@@ -154,7 +157,23 @@ export function activate(context: vscode.ExtensionContext) {
   );
   context.subscriptions.push(openNoteCommand);
 
-  // 6. Command: Refresh Sidebar
+  // 6. Command: Copy Today's Work Summary & Standup
+  const copyStandupCommand = vscode.commands.registerCommand(
+    'lfai.copyDailyStandup',
+    async () => {
+      const digest = NoteManager.getCachedDigest(context);
+      if (!digest) {
+        vscode.window.showInformationMessage('LFAI: 今日尚未提炼内容，请先执行「提炼今日代码与 AI 考点」。');
+        return;
+      }
+      const text = NoteManager.formatWorkSummaryForClipboard(digest);
+      await vscode.env.clipboard.writeText(text);
+      vscode.window.showInformationMessage('🎉 LFAI: 今日工作交付与 Standup 已复制到剪贴板，可直接粘贴！');
+    }
+  );
+  context.subscriptions.push(copyStandupCommand);
+
+  // 7. Command: Refresh Sidebar
   const refreshSidebarCommand = vscode.commands.registerCommand(
     'lfai.refreshSidebar',
     () => {
