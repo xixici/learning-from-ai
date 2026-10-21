@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="resources/banner.png" alt="LFAI — Learning From AI" width="640"/>
+  <img src="resources/banner.svg" alt="LFAI — Learning From AI" width="100%"/>
 </p>
 
 <h1 align="center">🧠 LFAI</h1>

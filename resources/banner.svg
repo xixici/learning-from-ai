@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="50%" stop-color="#1e1b4b" />
+      <stop offset="100%" stop-color="#090d16" />
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="50%" stop-color="#818cf8" />
+      <stop offset="100%" stop-color="#c084fc" />
+    </linearGradient>
+    <linearGradient id="glow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#818cf8" stop-opacity="0" />
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#38bdf8" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="400" rx="16" fill="url(#bg)" />
+
+  <!-- Subtle Circuit/Tech Grid -->
+  <g stroke="#ffffff" stroke-opacity="0.04" stroke-width="1">
+    <line x1="100" y1="0" x2="100" y2="400" />
+    <line x1="300" y1="0" x2="300" y2="400" />
+    <line x1="500" y1="0" x2="500" y2="400" />
+    <line x1="700" y1="0" x2="700" y2="400" />
+    <line x1="900" y1="0" x2="900" y2="400" />
+    <line x1="1100" y1="0" x2="1100" y2="400" />
+    <line x1="0" y1="100" x2="1200" y2="100" />
+    <line x1="0" y1="200" x2="1200" y2="200" />
+    <line x1="0" y1="300" x2="1200" y2="300" />
+  </g>
+
+  <!-- Glowing Orb Backing -->
+  <circle cx="210" cy="200" r="140" fill="url(#glow)" filter="blur(30px)" />
+
+  <!-- Left Side: Brain / Knowledge Icon -->
+  <g transform="translate(140, 130) scale(5.8)" filter="url(#shadow)">
+    <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-2.04z" fill="none" stroke="#38bdf8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-2.04z" fill="none" stroke="#818cf8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="12" cy="8" r="0.8" fill="#c084fc" />
+    <circle cx="12" cy="12" r="0.8" fill="#38bdf8" />
+    <circle cx="12" cy="16" r="0.8" fill="#818cf8" />
+  </g>
+
+  <!-- Right Side: Text Branding -->
+  <text x="360" y="170" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="78" font-weight="900" fill="url(#accent)" letter-spacing="2">
+    LFAI
+  </text>
+  
+  <text x="365" y="222" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="30" font-weight="600" fill="#f8fafc" letter-spacing="1">
+    Learning From AI
+  </text>
+
+  <text x="365" y="265" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="20" font-weight="400" fill="#94a3b8">
+    Turn daily AI-generated code into personalized 5-minute mastery cards.
+  </text>
+
+  <!-- Feature Pills -->
+  <g transform="translate(365, 295)">
+    <!-- Pill 1 -->
+    <rect x="0" y="0" width="165" height="34" rx="17" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+    <text x="82" y="22" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="500" fill="#38bdf8" text-anchor="middle">⚡ Git Diff Analysis</text>
+
+    <!-- Pill 2 -->
+    <rect x="180" y="0" width="175" height="34" rx="17" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+    <text x="267" y="22" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="500" fill="#818cf8" text-anchor="middle">💡 4D Cognitive Cards</text>
+
+    <!-- Pill 3 -->
+    <rect x="370" y="0" width="160" height="34" rx="17" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+    <text x="450" y="22" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="500" fill="#c084fc" text-anchor="middle">📝 Markdown Notes</text>
+
+    <!-- Pill 4 -->
+    <rect x="545" y="0" width="170" height="34" rx="17" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+    <text x="630" y="22" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="500" fill="#34d399" text-anchor="middle">❓ Active Recall Quiz</text>
+  </g>
+</svg>
