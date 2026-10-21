@@ -14,19 +14,16 @@
 
 <p align="center">
   <a href="https://marketplace.visualstudio.com/items?itemName=xixici.lfai">
-    <img src="https://img.shields.io/visual-studio-marketplace/v/xixici.lfai?style=flat-square&label=VS%20Marketplace&logo=visual-studio-code&color=007ACC" alt="VS Marketplace Version"/>
+    <img src="https://img.shields.io/badge/VS_Marketplace-v0.1.1-007ACC?style=flat-square&logo=visual-studio-code" alt="VS Marketplace Version"/>
   </a>
-  <a href="https://marketplace.visualstudio.com/items?itemName=xixici.lfai">
-    <img src="https://img.shields.io/visual-studio-marketplace/d/xixici.lfai?style=flat-square&color=007ACC&label=Installs" alt="VS Marketplace Downloads"/>
-  </a>
-  <a href="https://github.com/xixici/learning-from-ai/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/xixici/learning-from-ai?style=flat-square&color=brightgreen" alt="License: MIT"/>
+  <a href="https://github.com/xixici/learning-from-ai/releases">
+    <img src="https://img.shields.io/github/v/release/xixici/learning-from-ai?style=flat-square&color=blueviolet&logo=github" alt="GitHub Release"/>
   </a>
   <a href="https://github.com/xixici/learning-from-ai/actions/workflows/ci.yml">
     <img src="https://img.shields.io/github/actions/workflow/status/xixici/learning-from-ai/ci.yml?branch=main&style=flat-square&label=CI&logo=github-actions" alt="CI Status"/>
   </a>
-  <a href="https://github.com/xixici/learning-from-ai/releases">
-    <img src="https://img.shields.io/github/v/release/xixici/learning-from-ai?style=flat-square&color=blueviolet&logo=github" alt="GitHub Release"/>
+  <a href="https://github.com/xixici/learning-from-ai/blob/main/LICENSE">
+    <img src="https://img.shields.io/badge/license-MIT-brightgreen?style=flat-square" alt="License: MIT"/>
   </a>
 </p>
 
