@@ -33,8 +33,8 @@ This project follows the [Contributor Covenant Code of Conduct](https://www.cont
 ### Setup
 
 ```bash
-git clone https://github.com/l4ai/learning-for-the-ai-era.git
-cd learning-for-the-ai-era
+git clone https://github.com/xixici/-learning-from-ai.git
+cd -learning-from-ai
 npm install
 ```
 
