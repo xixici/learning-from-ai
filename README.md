@@ -1,15 +1,15 @@
 <p align="center">
-  <img src="resources/banner.png" alt="L4AI — Learning for the AI Era" width="640"/>
+  <img src="resources/banner.png" alt="L4AI — Learning from AI Era" width="640"/>
 </p>
 
 <h1 align="center">🧠 L4AI</h1>
 
 <p align="center">
-  <b>Learning for the AI Era</b>
+  <b>Learning from AI Era</b>
 </p>
 
 <p align="center">
-  Ship faster with AI. But actually learn while you do.
+  Ship faster with AI. But actually learn from what AI writes.
 </p>
 
 <p align="center">
@@ -46,9 +46,9 @@
 
 ---
 
-> **L4AI** = **L**earning **4**[for] the **AI** era
+> **L4AI** = **L**earning **4**[from] the **AI** era (Learning from AI Era)
 >
-> *The "4" isn't a typo — it's a statement. Like `i18n`, `a11y`, and `w3c`, it's a compression of intent: we're building for a generation of developers who code alongside AI, and still need to grow.*
+> *“4” 在口语和网络极简命名中巧妙融合了“for/from”的双重意涵：既是 Learn FROM AI（向 AI 产出的代码学习），又是 Learn FOR the AI Era（为了 AI 时代自我成长而学）。*
 
 ---
 

@@ -1,7 +1,7 @@
 {
   "name": "learning-from-ai",
-  "displayName": "L4AI — Learning for the AI Era",
-  "description": "Automatically extract what you should learn from today's AI-generated code. Syntax, architecture trade-offs, gotchas, and active recall quizzes — from your own daily work.",
+  "displayName": "Learning from AI Era (L4AI)",
+  "description": "从 AI 时代的代码变更与 Codex 交互中提炼核心考点、架构权衡与自测卡片，告别技能空心化。",
   "version": "0.1.0",
   "publisher": "l4ai-community",
   "repository": {

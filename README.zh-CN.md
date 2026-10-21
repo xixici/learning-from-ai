@@ -1,15 +1,15 @@
 <p align="center">
-  <img src="resources/banner.png" alt="L4AI — 为 AI 时代而学习" width="640"/>
+  <img src="resources/banner.png" alt="L4AI — 从 AI 时代中学习 (Learning from AI Era)" width="640"/>
 </p>
 
 <h1 align="center">🧠 L4AI</h1>
 
 <p align="center">
-  <b>Learning for the AI Era · 为 AI 时代而学习</b>
+  <b>Learning from AI Era · 从 AI 时代中学习</b>
 </p>
 
 <p align="center">
-  用 AI 更快地交付，同时真正学到东西。
+  别让 AI 替你写走了你的技术成长。从 AI 写的每一行代码中真正吸收知识。
 </p>
 
 <p align="center">
@@ -46,9 +46,9 @@
 
 ---
 
-> **L4AI** = **L**earning **4**[for] the **AI** era — 为 AI 时代而学习
+> **L4AI** = **L**earning **4**[from] the **AI** era — **Learning from AI Era**（从 AI 时代中学习）
 >
-> *「4」不是笔误，是一种表态。就像 `i18n`、`a11y`、`w3c`，它是一种意图的压缩：我们在为与 AI 并肩编程、同时依然渴望持续成长的开发者而构建。*
+> *「4」在这里一语双关：既代表 **Learn FROM AI**（从 AI 产出的代码中反哺自身认知），也代表 **Learn FOR the AI Era**（为迎接全面 AI 时代而持续积淀基本功）。*
 
 ---
 

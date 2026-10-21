@@ -1,4 +1,4 @@
-# Contributing to L4AI — Learning for the AI Era
+# Contributing to L4AI — Learning from AI Era
 
 Thank you for your interest in contributing! This document covers everything you need to get started.
 
