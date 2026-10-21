@@ -1,5 +1,5 @@
 name: 🐛 Bug Report
-description: Report a bug or unexpected behavior in L4AI
+description: Report a bug or unexpected behavior in LFAI
 title: "[Bug]: "
 labels: ["bug", "needs-triage"]
 assignees: []
@@ -23,7 +23,7 @@ body:
   - type: input
     id: extension-version
     attributes:
-      label: L4AI Extension Version
+      label: LFAI Extension Version
       description: Found in VS Code Extensions panel (`Ctrl+Shift+X`)
       placeholder: e.g. 0.1.0
     validations:
@@ -83,7 +83,7 @@ body:
       description: Exact steps to reproduce the behavior.
       placeholder: |
         1. Open a workspace with uncommitted changes
-        2. Press Ctrl+Shift+P → "L4AI: Extract Today's Learnings"
+        2. Press Ctrl+Shift+P → "LFAI: Extract Today's Learnings"
         3. See error / no output
     validations:
       required: true
@@ -109,10 +109,10 @@ body:
     attributes:
       label: Developer Console Logs
       description: |
-        Open **Help → Toggle Developer Tools → Console** in VS Code and paste any L4AI-related errors here.
+        Open **Help → Toggle Developer Tools → Console** in VS Code and paste any LFAI-related errors here.
       render: text
       placeholder: |
-        [L4AI] Error: ...
+        [LFAI] Error: ...
         TypeError: Cannot read properties of undefined...
 
   - type: textarea

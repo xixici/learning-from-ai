@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
   - name: 💬 Discussions
-    url: https://github.com/l4ai/learning-from-ai/discussions
+    url: https://github.com/xixici/learning-from-ai/discussions
     about: Ask questions, share your learning setups, or discuss ideas with the community.
   - name: 📖 Documentation
-    url: https://github.com/l4ai/learning-from-ai#readme
+    url: https://github.com/xixici/learning-from-ai#readme
     about: Read the full README before opening an issue.

@@ -44,7 +44,7 @@ npm install
    ```bash
    code .
    ```
-2. Press `F5` to launch the **Extension Development Host** — a new VS Code window with L4AI loaded.
+2. Press `F5` to launch the **Extension Development Host** — a new VS Code window with LFAI loaded.
 3. Make changes in `src/`, then reload the host window with `Ctrl+R`.
 
 ### Building
@@ -174,7 +174,7 @@ Before submitting, verify:
 
 Use the [Bug Report template](.github/ISSUE_TEMPLATE/bug_report.yml). Please include:
 - VS Code version
-- L4AI extension version
+- LFAI extension version
 - Operating system
 - Steps to reproduce
 - Expected vs actual behavior

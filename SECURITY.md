@@ -12,8 +12,8 @@ If you discover a security vulnerability in **LFAI — Learning From AI**, pleas
 
 Instead, please report it via:
 
-1. **GitHub Security Advisories**: [Report a vulnerability](https://github.com/l4ai/learning-from-ai/security/advisories/new) *(preferred)*
-2. **Email**: If you cannot use GitHub Security Advisories, email the maintainers directly at `security@l4ai-community.dev`
+1. **GitHub Security Advisories**: [Report a vulnerability](https://github.com/xixici/learning-from-ai/security/advisories/new) *(preferred)*
+2. **Email**: If you cannot use GitHub Security Advisories, email the maintainers directly at `202388990@qq.com`
 
 ### What to Include
 
@@ -30,7 +30,7 @@ Instead, please report it via:
 
 ### Scope
 
-L4AI is a VS Code extension that:
+LFAI is a VS Code extension that:
 - Reads your local Git diff and workspace files
 - Sends code context to external LLM APIs (only if configured)
 - Writes Markdown files to your workspace

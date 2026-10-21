@@ -1,4 +1,4 @@
-# VS Code Launch Configuration for L4AI Development
+// VS Code Launch Configuration for LFAI Development
 {
   "version": "0.2.0",
   "configurations": [

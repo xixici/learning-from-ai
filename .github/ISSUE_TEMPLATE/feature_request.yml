@@ -1,5 +1,5 @@
 name: 💡 Feature Request
-description: Suggest a new feature or enhancement for L4AI
+description: Suggest a new feature or enhancement for LFAI
 title: "[Feature]: "
 labels: ["enhancement", "needs-triage"]
 assignees: []
@@ -8,7 +8,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for helping make L4AI better! Please describe your feature request in as much detail as possible.
+        Thanks for helping make LFAI better! Please describe your feature request in as much detail as possible.
 
   - type: checkboxes
     id: preflight
@@ -60,7 +60,7 @@ body:
     attributes:
       label: How important is this to you?
       options:
-        - Critical — blocks my adoption of L4AI
+        - Critical — blocks my adoption of LFAI
         - High — would significantly improve my workflow
         - Medium — nice to have
         - Low — minor quality-of-life improvement

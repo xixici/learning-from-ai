@@ -78,5 +78,7 @@ This project adheres to [Semantic Versioning](https://semver.org/) and [Keep a C
 
 ---
 
-[Unreleased]: https://github.com/l4ai/learning-from-ai/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/l4ai/learning-from-ai/releases/tag/v0.1.0
+[Unreleased]: https://github.com/xixici/learning-from-ai/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/xixici/learning-from-ai/compare/v0.1.1...v0.1.2
+[0.1.1]: https://github.com/xixici/learning-from-ai/compare/v0.1.0...v0.1.1
+[0.1.0]: https://github.com/xixici/learning-from-ai/releases/tag/v0.1.0

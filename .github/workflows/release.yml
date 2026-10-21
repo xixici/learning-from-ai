@@ -122,7 +122,7 @@ jobs:
                   | head -n -1 \
                   | tail -n +2)
           if [ -z "$NOTES" ]; then
-            NOTES="See [CHANGELOG.md](https://github.com/l4ai/learning-from-ai/blob/main/CHANGELOG.md) for details."
+            NOTES="See [CHANGELOG.md](https://github.com/xixici/learning-from-ai/blob/main/CHANGELOG.md) for details."
           fi
           {
             echo "notes<<EOF"
@@ -134,7 +134,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.validate.outputs.tag }}
-          name: "🧠 L4AI ${{ needs.validate.outputs.tag }}"
+          name: "🧠 LFAI ${{ needs.validate.outputs.tag }}"
           prerelease: ${{ needs.validate.outputs.is_prerelease }}
           body: |
             ## What's Changed
@@ -146,7 +146,7 @@ jobs:
             ## 📦 Installation
 
             ### Option A — VS Code Marketplace *(Recommended)*
-            Search for **"Learning from AI"** in the Extensions panel (`Ctrl+Shift+X`).
+            Search for **"LFAI"** in the Extensions panel (`Ctrl+Shift+X`).
 
             ### Option B — Manual VSIX Install
             Download the `.vsix` file below, then run:
@@ -156,13 +156,13 @@ jobs:
 
             ---
 
-            **Full Changelog**: https://github.com/l4ai/learning-from-ai/blob/main/CHANGELOG.md
+            **Full Changelog**: https://github.com/xixici/learning-from-ai/blob/main/CHANGELOG.md
           files: |
             ${{ needs.build-and-package.outputs.vsix-name }}
 
   # ─────────────────────────────────────────────────────────
   # Job 4: Publish to VS Code Marketplace
-  # (requires VSCE_PAT secret — skip if not configured)
+  # (requires VSCE_PAT secret in GitHub repository secrets)
   # ─────────────────────────────────────────────────────────
   publish-marketplace:
     name: Publish to VS Marketplace
@@ -170,7 +170,6 @@ jobs:
     needs: [validate, build-and-package, github-release]
     # Only publish stable releases (not pre-releases)
     if: needs.validate.outputs.is_prerelease == 'false'
-    environment: marketplace  # Optional: add approval gate in GitHub Environments
 
     steps:
       - name: Checkout code
@@ -190,20 +189,27 @@ jobs:
         with:
           name: vsix-release
 
+      - name: Check VSCE_PAT secret
+        id: check-pat
+        run: |
+          if [ -n "${{ secrets.VSCE_PAT }}" ]; then
+            echo "has_pat=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_pat=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Publish to VS Code Marketplace
-        if: env.VSCE_PAT != ''
+        if: steps.check-pat.outputs.has_pat == 'true'
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
         run: |
           VSIX_FILE=$(ls *.vsix)
           echo "Publishing $VSIX_FILE to VS Code Marketplace..."
           npx @vscode/vsce publish --pat "$VSCE_PAT" --packagePath "$VSIX_FILE"
-          echo "✅ Published successfully!"
+          echo "✅ Published successfully to VS Code Marketplace!"
 
       - name: Skip marketplace publish (no PAT configured)
-        if: env.VSCE_PAT == ''
-        env:
-          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        if: steps.check-pat.outputs.has_pat == 'false'
         run: |
-          echo "⚠️  VSCE_PAT secret not configured — skipping marketplace publish."
-          echo "To enable: add VSCE_PAT to repository secrets."
+          echo "⚠️ VSCE_PAT secret not configured in repository secrets."
+          echo "To enable automatic publishing: Go to Settings -> Secrets and variables -> Actions, and add secret VSCE_PAT."
