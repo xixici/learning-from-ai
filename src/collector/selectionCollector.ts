@@ -5,7 +5,7 @@ import { ExtractionRequest } from '../types';
 export function collectActiveSelection(): ExtractionRequest | null {
   const editor = vscode.window.activeTextEditor;
   if (!editor) {
-    vscode.window.showWarningMessage('L4AI: 请先在编辑器中打开文件并选中代码。');
+    vscode.window.showWarningMessage('LFAI: 请先在编辑器中打开文件并选中代码。');
     return null;
   }
 
@@ -13,7 +13,7 @@ export function collectActiveSelection(): ExtractionRequest | null {
   const selectedText = editor.document.getText(selection);
 
   if (!selectedText.trim()) {
-    vscode.window.showInformationMessage('L4AI: 请先选中一段代码，再进行知识提炼。');
+    vscode.window.showInformationMessage('LFAI: 请先选中一段代码，再进行知识提炼。');
     return null;
   }
 

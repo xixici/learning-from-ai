@@ -1,32 +1,32 @@
 <p align="center">
-  <img src="resources/banner.png" alt="L4AI — Learning from AI Era" width="640"/>
+  <img src="resources/banner.png" alt="LFAI — Learning From AI" width="640"/>
 </p>
 
-<h1 align="center">🧠 L4AI</h1>
+<h1 align="center">🧠 LFAI</h1>
 
 <p align="center">
-  <b>Learning from AI Era</b>
-</p>
-
-<p align="center">
-  Ship faster with AI. But actually learn from what AI writes.
+  <b>Learning From AI</b>
 </p>
 
 <p align="center">
-  <a href="https://marketplace.visualstudio.com/items?itemName=l4ai-community.learning-from-ai">
-    <img src="https://img.shields.io/visual-studio-marketplace/v/l4ai-community.learning-from-ai?style=flat-square&label=VS%20Marketplace&logo=visual-studio-code&color=007ACC" alt="VS Marketplace Version"/>
+  Ship faster with AI. But actually learn from every line it writes.
+</p>
+
+<p align="center">
+  <a href="https://marketplace.visualstudio.com/items?itemName=lfai-community.lfai">
+    <img src="https://img.shields.io/visual-studio-marketplace/v/lfai-community.lfai?style=flat-square&label=VS%20Marketplace&logo=visual-studio-code&color=007ACC" alt="VS Marketplace Version"/>
   </a>
-  <a href="https://marketplace.visualstudio.com/items?itemName=l4ai-community.learning-from-ai">
-    <img src="https://img.shields.io/visual-studio-marketplace/d/l4ai-community.learning-from-ai?style=flat-square&color=007ACC&label=Installs" alt="VS Marketplace Downloads"/>
+  <a href="https://marketplace.visualstudio.com/items?itemName=lfai-community.lfai">
+    <img src="https://img.shields.io/visual-studio-marketplace/d/lfai-community.lfai?style=flat-square&color=007ACC&label=Installs" alt="VS Marketplace Downloads"/>
   </a>
-  <a href="https://github.com/l4ai/learning-for-the-ai-era/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/l4ai/learning-for-the-ai-era?style=flat-square&color=brightgreen" alt="License: MIT"/>
+  <a href="https://github.com/lfai/learning-from-ai/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/lfai/learning-from-ai?style=flat-square&color=brightgreen" alt="License: MIT"/>
   </a>
-  <a href="https://github.com/l4ai/learning-for-the-ai-era/actions/workflows/ci.yml">
-    <img src="https://img.shields.io/github/actions/workflow/status/l4ai/learning-for-the-ai-era/ci.yml?branch=main&style=flat-square&label=CI&logo=github-actions" alt="CI Status"/>
+  <a href="https://github.com/lfai/learning-from-ai/actions/workflows/ci.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/lfai/learning-from-ai/ci.yml?branch=main&style=flat-square&label=CI&logo=github-actions" alt="CI Status"/>
   </a>
-  <a href="https://github.com/l4ai/learning-for-the-ai-era/releases">
-    <img src="https://img.shields.io/github/v/release/l4ai/learning-for-the-ai-era?style=flat-square&color=blueviolet&logo=github" alt="GitHub Release"/>
+  <a href="https://github.com/lfai/learning-from-ai/releases">
+    <img src="https://img.shields.io/github/v/release/lfai/learning-from-ai?style=flat-square&color=blueviolet&logo=github" alt="GitHub Release"/>
   </a>
 </p>
 
@@ -46,9 +46,9 @@
 
 ---
 
-> **L4AI** = **L**earning **4**[from] the **AI** era (Learning from AI Era)
+> **LFAI** = **L**earning **F**rom **AI**
 >
-> *“4” 在口语和网络极简命名中巧妙融合了“for/from”的双重意涵：既是 Learn FROM AI（向 AI 产出的代码学习），又是 Learn FOR the AI Era（为了 AI 时代自我成长而学）。*
+> *Direct. Clear. Meaningful. Let AI write the boilerplate, but make sure YOU learn the craft.*
 
 ---
 
@@ -60,9 +60,7 @@ AI coding tools (GitHub Copilot, Cursor, Claude Code) have created a silent para
 
 Every day, AI writes thousands of lines you accept without truly understanding — complex async patterns, architecture decisions, subtle edge guards. Three days later, you can't reproduce or debug them independently.
 
-This isn't laziness. **It's a structural gap in the AI-era workflow.** There's no natural moment where understanding is required before code gets merged.
-
-**L4AI closes that gap.** It automatically turns your daily AI-assisted code into a personalized 5-minute learning session — not generic tutorials, but knowledge extracted from *your own work*.
+**LFAI closes that gap.** It automatically turns your daily AI-assisted code into a personalized 5-minute learning session — not generic tutorials, but knowledge extracted from *your own work*.
 
 ---
 
@@ -82,24 +80,20 @@ Scans today's Git incremental changes, filters noise (lockfiles, build artifacts
 
 ### 🖥️ Native VS Code Sidebar Panel
 
-<p align="center">
-  <img src="resources/screenshot-sidebar.png" alt="L4AI Sidebar Screenshot" width="380"/>
-</p>
-
 - Filter cards by category with one click
 - Expand/collapse deep-dive explanations on demand
 - Interactive quiz mode with reveal-on-demand answers
 - Copy code snippets directly to clipboard
 
 ### 📝 Markdown Knowledge Base
-Every daily digest auto-saves to `.l4ai/daily/YYYY-MM-DD.md` — plain Markdown, compatible with **Obsidian**, **Logseq**, **Notion**, and any note-taking tool.
+Every daily digest auto-saves to `.lfai/daily/YYYY-MM-DD.md` — plain Markdown, compatible with **Obsidian**, **Logseq**, **Notion**, and any note-taking tool.
 
 ### 🤖 Zero-Config LLM Support
 - **VS Code LM API** (default): Uses your existing GitHub Copilot subscription — no API key needed
 - **Custom LLM**: DeepSeek, OpenAI, Claude, or any local Ollama endpoint
 
 ### ✂️ Selection-Based Instant Learning
-Right-click any code selection → **"L4AI: Extract Learning from Selection"** — on-demand deep analysis of any snippet.
+Right-click any code selection → **"LFAI: Extract Learning from Selection"** — on-demand deep analysis of any snippet.
 
 ---
 
@@ -108,19 +102,19 @@ Right-click any code selection → **"L4AI: Extract Learning from Selection"** �
 ### Install from VS Marketplace *(Recommended)*
 1. Open VS Code
 2. Press `Ctrl+Shift+X`
-3. Search for **"L4AI"**
+3. Search for **"LFAI"**
 4. Click **Install**
 
 ### Install from VSIX (Manual)
 ```bash
-code --install-extension learning-from-ai-0.1.0.vsix
+code --install-extension lfai-0.1.0.vsix
 ```
 
 ### First Use
 1. Open any project with code changes
-2. Press `Ctrl+Shift+P` → **`L4AI: Extract Today's Learnings`**
+2. Press `Ctrl+Shift+P` → **`LFAI: Extract Today's Learnings`**
 3. Check the sidebar (brain icon in Activity Bar) for today's cards
-4. Find your Markdown notes in `.l4ai/daily/`
+4. Find your Markdown notes in `.lfai/daily/`
 
 ---
 
@@ -156,95 +150,15 @@ Your Code Changes (Git Diff / Selection)
 
 ## ⚙️ Configuration
 
-Open VS Code Settings (`Ctrl+,`) and search for `l4ai`:
+Open VS Code Settings (`Ctrl+,`) and search for `lfai`:
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `l4ai.llmProvider` | `vscode.lm` | LLM backend: `vscode.lm` (Copilot) or `custom` |
-| `l4ai.customApiBaseUrl` | `https://api.deepseek.com/v1` | Base URL for custom OpenAI-compatible API |
-| `l4ai.customApiKey` | `""` | API key for custom provider |
-| `l4ai.customModel` | `deepseek-chat` | Model name for custom provider |
-| `l4ai.notesDir` | `.l4ai/daily` | Directory for Markdown notes (relative to workspace root) |
-
-### Example: Using DeepSeek
-
-```json
-{
-  "l4ai.llmProvider": "custom",
-  "l4ai.customApiBaseUrl": "https://api.deepseek.com/v1",
-  "l4ai.customApiKey": "sk-your-key-here",
-  "l4ai.customModel": "deepseek-chat"
-}
-```
-
-### Example: Using Local Ollama
-
-```json
-{
-  "l4ai.llmProvider": "custom",
-  "l4ai.customApiBaseUrl": "http://localhost:11434/v1",
-  "l4ai.customApiKey": "ollama",
-  "l4ai.customModel": "llama3.1:8b"
-}
-```
-
----
-
-## 🤝 Contributing
-
-Contributions are very welcome! Please read our [Contributing Guide](CONTRIBUTING.md) first.
-
-### Development Setup
-
-```bash
-git clone https://github.com/l4ai/learning-for-the-ai-era.git
-cd learning-for-the-ai-era
-npm install
-npm run build          # dev build with source maps
-npm run package        # production build
-npm run package:vsix   # package as installable VSIX
-npm run build -- --watch  # watch mode
-```
-
-### Project Structure
-
-```
-l4ai/
-├── src/
-│   ├── extension.ts              # Entry point & command registration
-│   ├── types.ts                  # Shared TypeScript types
-│   ├── collector/
-│   │   ├── gitCollector.ts       # Git diff & workspace code collector
-│   │   └── selectionCollector.ts # Active editor selection collector
-│   ├── engine/
-│   │   ├── llmClient.ts          # Dual-channel LLM client (vscode.lm + custom)
-│   │   └── prompt.ts             # 4-dimensional extraction prompt engineering
-│   ├── storage/
-│   │   └── noteManager.ts        # Markdown persistence & workspace state cache
-│   └── ui/
-│       └── sidebarProvider.ts    # Webview sidebar panel & interactive UI
-├── resources/                    # Icons and static assets
-├── .github/
-│   ├── workflows/
-│   │   ├── ci.yml                # CI: build, typecheck, lint on every PR
-│   │   └── release.yml           # Release: auto-package & publish on version tag
-│   └── ISSUE_TEMPLATE/
-├── package.json
-├── tsconfig.json
-├── esbuild.js
-└── CHANGELOG.md
-```
-
-### Commit Convention
-
-We follow [Conventional Commits](https://www.conventionalcommits.org/):
-
-```
-feat: add Anki export support
-fix: handle empty git diff gracefully
-docs: update configuration examples
-chore: bump esbuild to 0.24
-```
+| `lfai.llmProvider` | `vscode.lm` | LLM backend: `vscode.lm` (Copilot) or `custom` |
+| `lfai.customApiBaseUrl` | `https://api.deepseek.com/v1` | Base URL for custom OpenAI-compatible API |
+| `lfai.customApiKey` | `""` | API key for custom provider |
+| `lfai.customModel` | `deepseek-chat` | Model name for custom provider |
+| `lfai.notesDir` | `.lfai/daily` | Directory for Markdown notes (relative to workspace root) |
 
 ---
 
@@ -252,10 +166,10 @@ chore: bump esbuild to 0.24
 
 | Command | Description |
 |---------|-------------|
-| `L4AI: Extract Today's Learnings` | Analyze today's git diff and generate learning cards |
-| `L4AI: Extract Learning from Selection` | Deep-dive analysis of selected code snippet |
-| `L4AI: Open Today's Note` | Open today's Markdown digest file |
-| `L4AI: Refresh Sidebar` | Reload the sidebar panel |
+| `LFAI: Extract Today's Learnings` | Analyze today's git diff and generate learning cards |
+| `LFAI: Extract Learning from Selection` | Deep-dive analysis of selected code snippet |
+| `LFAI: Open Today's Note` | Open today's Markdown digest file |
+| `LFAI: Refresh Sidebar` | Reload the sidebar panel |
 
 ---
 
@@ -271,10 +185,4 @@ chore: bump esbuild to 0.24
 
 ## 📄 License
 
-MIT © [L4AI Community](https://github.com/l4ai)
-
----
-
-<p align="center">
-  Built for developers who ship with AI — and still want to grow.
-</p>
+MIT © [LFAI Community](https://github.com/lfai)

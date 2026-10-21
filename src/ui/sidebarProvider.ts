@@ -2,8 +2,8 @@ import * as vscode from 'vscode';
 import { DailyDigest } from '../types';
 import { NoteManager } from '../storage/noteManager';
 
-export class L4AISidebarProvider implements vscode.WebviewViewProvider {
-  public static readonly viewType = 'l4ai.sidebarView';
+export class LFAISidebarProvider implements vscode.WebviewViewProvider {
+  public static readonly viewType = 'lfai.sidebarView';
   private _view?: vscode.WebviewView;
 
   constructor(private readonly _context: vscode.ExtensionContext) {}
@@ -25,14 +25,14 @@ export class L4AISidebarProvider implements vscode.WebviewViewProvider {
     webviewView.webview.onDidReceiveMessage(async (data) => {
       switch (data.type) {
         case 'extractToday':
-          await vscode.commands.executeCommand('l4ai.extractTodayLearnings');
+          await vscode.commands.executeCommand('lfai.extractTodayLearnings');
           break;
         case 'openNote':
-          await vscode.commands.executeCommand('l4ai.openTodayNote');
+          await vscode.commands.executeCommand('lfai.openTodayNote');
           break;
         case 'copyCode':
           await vscode.env.clipboard.writeText(data.code || '');
-          vscode.window.showInformationMessage('L4AI: 代码已复制到剪贴板。');
+          vscode.window.showInformationMessage('LFAI: 代码已复制到剪贴板。');
           break;
         case 'notify':
           vscode.window.showInformationMessage(data.text);
@@ -72,7 +72,7 @@ export class L4AISidebarProvider implements vscode.WebviewViewProvider {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Learning from AI</title>
+  <title>Learning From AI (LFAI)</title>
   <style>
     :root {
       --bg: var(--vscode-sideBar-background, #1e1e1e);
@@ -327,7 +327,7 @@ export class L4AISidebarProvider implements vscode.WebviewViewProvider {
 <body>
   <div class="header-box">
     <div class="title-row">
-      <span class="title-main">🧠 L4AI 学习复盘</span>
+      <span class="title-main">🧠 LFAI 学习复盘</span>
       <span class="date-badge">${todayStr} (${totalCount} 张卡片)</span>
     </div>
     <div class="summary-text" id="summaryBox">${summaryText}</div>
@@ -389,7 +389,7 @@ export class L4AISidebarProvider implements vscode.WebviewViewProvider {
           <div class="empty-state">
             <div class="icon">🚀</div>
             <div>暂无满足条件的学习卡片</div>
-            <div style="font-size:11px; margin-top:6px; opacity:0.6;">点击「提炼今日考点」从 Git 代码与 Codex 交互中获取</div>
+            <div style="font-size:11px; margin-top:6px; opacity:0.6;">点击「提炼今日考点」从 Git 代码与 AI 交互中获取</div>
           </div>
         \`;
         return;

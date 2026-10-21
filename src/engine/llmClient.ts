@@ -8,7 +8,7 @@ export class LLMClient {
     fileHints?: string[],
     token?: vscode.CancellationToken
   ): Promise<DailyDigest> {
-    const config = vscode.workspace.getConfiguration('l4ai');
+    const config = vscode.workspace.getConfiguration('lfai');
     const provider = config.get<string>('llmProvider', 'vscode.lm');
 
     const promptText = buildUserPrompt(codeContext, fileHints);
@@ -20,7 +20,7 @@ export class LLMClient {
         rawResponse = await this.callVsCodeLM(promptText, token);
       } catch (err: unknown) {
         const errorMsg = err instanceof Error ? err.message : String(err);
-        vscode.window.showWarningMessage(`L4AI: 尝试调用 VS Code LM 失败 (${errorMsg})，正在检查自定义 API 配置...`);
+        vscode.window.showWarningMessage(`LFAI: 尝试调用 VS Code LM 失败 (${errorMsg})，正在检查自定义 API 配置...`);
         rawResponse = await this.callCustomAPI(promptText);
       }
     } else {
@@ -74,14 +74,14 @@ export class LLMClient {
   }
 
   private static async callCustomAPI(userPrompt: string): Promise<string> {
-    const config = vscode.workspace.getConfiguration('l4ai');
+    const config = vscode.workspace.getConfiguration('lfai');
     const baseUrl = config.get<string>('customApiBaseUrl', 'https://api.deepseek.com/v1');
     const apiKey = config.get<string>('customApiKey', '');
     const model = config.get<string>('customModel', 'deepseek-chat');
 
     if (!apiKey) {
       vscode.window.showInformationMessage(
-        'L4AI: 未检测到 Copilot 或自定义 API Key。已为您展示智能分析样例，您可在设置中配置 `l4ai.customApiKey`。'
+        'LFAI: 未检测到 Copilot 或自定义 API Key。已为您展示智能分析样例，您可在设置中配置 `lfai.customApiKey`。'
       );
       return '';
     }

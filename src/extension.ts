@@ -3,15 +3,15 @@ import { collectTodayGitDiff } from './collector/gitCollector';
 import { collectActiveSelection } from './collector/selectionCollector';
 import { LLMClient } from './engine/llmClient';
 import { NoteManager } from './storage/noteManager';
-import { L4AISidebarProvider } from './ui/sidebarProvider';
+import { LFAISidebarProvider } from './ui/sidebarProvider';
 import { DailyDigest } from './types';
 
 export function activate(context: vscode.ExtensionContext) {
   // 1. Register Sidebar Webview Provider
-  const sidebarProvider = new L4AISidebarProvider(context);
+  const sidebarProvider = new LFAISidebarProvider(context);
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(
-      L4AISidebarProvider.viewType,
+      LFAISidebarProvider.viewType,
       sidebarProvider
     )
   );
@@ -21,26 +21,26 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.StatusBarAlignment.Right,
     100
   );
-  statusBarItem.command = 'l4ai.extractTodayLearnings';
-  statusBarItem.text = '$(brain) L4AI: 今日知识';
-  statusBarItem.tooltip = '点击提炼今日代码与 Codex 考点卡片';
+  statusBarItem.command = 'lfai.extractTodayLearnings';
+  statusBarItem.text = '$(brain) LFAI: 今日知识';
+  statusBarItem.tooltip = '点击提炼今日代码与 AI 考点卡片';
   statusBarItem.show();
   context.subscriptions.push(statusBarItem);
 
   // Update status bar with cached digest if exists
   const cached = NoteManager.getCachedDigest(context);
   if (cached) {
-    statusBarItem.text = `$(brain) L4AI: ${cached.totalCards}张卡片`;
+    statusBarItem.text = `$(brain) LFAI: ${cached.totalCards}张卡片`;
   }
 
   // 3. Command: Extract Today's Learnings
   const extractTodayCommand = vscode.commands.registerCommand(
-    'l4ai.extractTodayLearnings',
+    'lfai.extractTodayLearnings',
     async () => {
       await vscode.window.withProgress(
         {
           location: vscode.ProgressLocation.Notification,
-          title: 'L4AI: 正在分析今日代码与 Codex 交互，提炼核心考点...',
+          title: 'LFAI: 正在分析今日代码与 AI 交互，提炼核心考点...',
           cancellable: true,
         },
         async (progress, token) => {
@@ -50,7 +50,7 @@ export function activate(context: vscode.ExtensionContext) {
 
           if (!extractionRequest || !extractionRequest.codeContext.trim()) {
             const answer = await vscode.window.showInformationMessage(
-              'L4AI: 今日暂未检测到明显的 Git 提交或文件修改。是否生成智能示范复盘卡片？',
+              'LFAI: 今日暂未检测到明显的 Git 提交或文件修改。是否生成智能示范复盘卡片？',
               '生成示范卡片',
               '取消'
             );
@@ -77,7 +77,7 @@ export function activate(context: vscode.ExtensionContext) {
             );
           } catch (err: unknown) {
             const msg = err instanceof Error ? err.message : String(err);
-            vscode.window.showErrorMessage(`L4AI 提炼失败: ${msg}`);
+            vscode.window.showErrorMessage(`LFAI 提炼失败: ${msg}`);
             return;
           }
 
@@ -86,12 +86,12 @@ export function activate(context: vscode.ExtensionContext) {
           const savedPath = await NoteManager.saveDigest(context, digest);
           sidebarProvider.updateDigest(digest);
 
-          statusBarItem.text = `$(brain) L4AI: ${digest.totalCards}张卡片`;
+          statusBarItem.text = `$(brain) LFAI: ${digest.totalCards}张卡片`;
 
           progress.report({ increment: 10, message: '提炼完成！' });
 
           const action = await vscode.window.showInformationMessage(
-            `🎉 L4AI: 今日成功提炼 ${digest.totalCards} 张学习卡片！`,
+            `🎉 LFAI: 今日成功提炼 ${digest.totalCards} 张学习卡片！`,
             '查看 Markdown 笔记',
             '在侧边栏复习'
           );
@@ -100,7 +100,7 @@ export function activate(context: vscode.ExtensionContext) {
             const doc = await vscode.workspace.openTextDocument(savedPath);
             await vscode.window.showTextDocument(doc, { preview: false });
           } else if (action === '在侧边栏复习') {
-            await vscode.commands.executeCommand('l4ai.sidebarView.focus');
+            await vscode.commands.executeCommand('lfai.sidebarView.focus');
           }
         }
       );
@@ -110,7 +110,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   // 4. Command: Extract from Selected Code
   const extractSelectionCommand = vscode.commands.registerCommand(
-    'l4ai.extractSelection',
+    'lfai.extractSelection',
     async () => {
       const req = collectActiveSelection();
       if (!req) {
@@ -120,7 +120,7 @@ export function activate(context: vscode.ExtensionContext) {
       await vscode.window.withProgress(
         {
           location: vscode.ProgressLocation.Notification,
-          title: 'L4AI: 正在提炼选中代码考点与底层原理...',
+          title: 'LFAI: 正在提炼选中代码考点与底层原理...',
           cancellable: true,
         },
         async (progress, token) => {
@@ -134,10 +134,10 @@ export function activate(context: vscode.ExtensionContext) {
 
           await NoteManager.saveDigest(context, digest);
           sidebarProvider.updateDigest(digest);
-          statusBarItem.text = `$(brain) L4AI: ${digest.totalCards}张卡片`;
+          statusBarItem.text = `$(brain) LFAI: ${digest.totalCards}张卡片`;
 
           vscode.window.showInformationMessage(
-            `L4AI: 已为选中代码提炼 ${digest.totalCards} 张原理卡片，已同步至侧边栏！`
+            `LFAI: 已为选中代码提炼 ${digest.totalCards} 张原理卡片，已同步至侧边栏！`
           );
         }
       );
@@ -147,7 +147,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   // 5. Command: Open Today's Markdown Note
   const openNoteCommand = vscode.commands.registerCommand(
-    'l4ai.openTodayNote',
+    'lfai.openTodayNote',
     async () => {
       await NoteManager.openTodayNote();
     }
@@ -156,7 +156,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   // 6. Command: Refresh Sidebar
   const refreshSidebarCommand = vscode.commands.registerCommand(
-    'l4ai.refreshSidebar',
+    'lfai.refreshSidebar',
     () => {
       sidebarProvider.refresh();
     }

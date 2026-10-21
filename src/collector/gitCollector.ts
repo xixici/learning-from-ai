@@ -31,6 +31,7 @@ const IGNORED_PATHS = [
   'out',
   '.git',
   '.vscode',
+  '.lfai',
   '.l4ai',
   'package-lock.json',
   'pnpm-lock.yaml',
@@ -52,7 +53,7 @@ function runGit(args: string[], cwd: string): Promise<string> {
 export async function collectTodayGitDiff(): Promise<ExtractionRequest | null> {
   const workspaceFolders = vscode.workspace.workspaceFolders;
   if (!workspaceFolders || workspaceFolders.length === 0) {
-    vscode.window.showWarningMessage('L4AI: 请在打开的工作区中运行此命令。');
+    vscode.window.showWarningMessage('LFAI: 请在打开的工作区中运行此命令。');
     return null;
   }
 

@@ -1,12 +1,12 @@
 {
-  "name": "learning-from-ai",
-  "displayName": "Learning from AI Era (L4AI)",
-  "description": "从 AI 时代的代码变更与 Codex 交互中提炼核心考点、架构权衡与自测卡片，告别技能空心化。",
+  "name": "lfai",
+  "displayName": "LFAI — Learning From AI",
+  "description": "从每日代码变更与 AI 交互中提炼核心考点、架构权衡与自测卡片，告别 AI 时代技能空心化。",
   "version": "0.1.0",
-  "publisher": "l4ai-community",
+  "publisher": "lfai-community",
   "repository": {
     "type": "git",
-    "url": "https://github.com/l4ai/learning-from-ai"
+    "url": "https://github.com/lfai/learning-from-ai"
   },
   "engines": {
     "vscode": "^1.90.0"
@@ -33,77 +33,77 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "l4ai-sidebar-container",
-          "title": "Learning from AI",
+          "id": "lfai-sidebar-container",
+          "title": "Learning From AI (LFAI)",
           "icon": "resources/brain.svg"
         }
       ]
     },
     "views": {
-      "l4ai-sidebar-container": [
+      "lfai-sidebar-container": [
         {
           "type": "webview",
-          "id": "l4ai.sidebarView",
+          "id": "lfai.sidebarView",
           "name": "今日学习复盘 (Daily Digest)"
         }
       ]
     },
     "commands": [
       {
-        "command": "l4ai.extractTodayLearnings",
-        "title": "提炼今日代码与 Codex 考点",
-        "category": "L4AI",
+        "command": "lfai.extractTodayLearnings",
+        "title": "提炼今日代码与 AI 考点",
+        "category": "LFAI",
         "icon": "$(sparkle)"
       },
       {
-        "command": "l4ai.extractSelection",
+        "command": "lfai.extractSelection",
         "title": "提炼当前选中代码深度原理",
-        "category": "L4AI",
+        "category": "LFAI",
         "icon": "$(book)"
       },
       {
-        "command": "l4ai.openTodayNote",
+        "command": "lfai.openTodayNote",
         "title": "打开今日学习笔记",
-        "category": "L4AI",
+        "category": "LFAI",
         "icon": "$(markdown)"
       },
       {
-        "command": "l4ai.refreshSidebar",
+        "command": "lfai.refreshSidebar",
         "title": "刷新今日学习看板",
-        "category": "L4AI",
+        "category": "LFAI",
         "icon": "$(refresh)"
       }
     ],
     "menus": {
       "editor/context": [
         {
-          "command": "l4ai.extractSelection",
+          "command": "lfai.extractSelection",
           "when": "editorHasSelection",
-          "group": "L4AI"
+          "group": "LFAI"
         }
       ],
       "view/title": [
         {
-          "command": "l4ai.extractTodayLearnings",
-          "when": "view == l4ai.sidebarView",
+          "command": "lfai.extractTodayLearnings",
+          "when": "view == lfai.sidebarView",
           "group": "navigation@1"
         },
         {
-          "command": "l4ai.openTodayNote",
-          "when": "view == l4ai.sidebarView",
+          "command": "lfai.openTodayNote",
+          "when": "view == lfai.sidebarView",
           "group": "navigation@2"
         },
         {
-          "command": "l4ai.refreshSidebar",
-          "when": "view == l4ai.sidebarView",
+          "command": "lfai.refreshSidebar",
+          "when": "view == lfai.sidebarView",
           "group": "navigation@3"
         }
       ]
     },
     "configuration": {
-      "title": "Learning from AI (L4AI)",
+      "title": "Learning From AI (LFAI)",
       "properties": {
-        "l4ai.llmProvider": {
+        "lfai.llmProvider": {
           "type": "string",
           "default": "vscode.lm",
           "enum": [
@@ -116,24 +116,24 @@
           ],
           "description": "LLM 模型提供方"
         },
-        "l4ai.customApiBaseUrl": {
+        "lfai.customApiBaseUrl": {
           "type": "string",
           "default": "https://api.deepseek.com/v1",
           "description": "自定义 LLM 基础 URL（当提供方为 custom 时有效）"
         },
-        "l4ai.customApiKey": {
+        "lfai.customApiKey": {
           "type": "string",
           "default": "",
           "description": "自定义 LLM API Key"
         },
-        "l4ai.customModel": {
+        "lfai.customModel": {
           "type": "string",
           "default": "deepseek-chat",
           "description": "自定义模型名称（如 deepseek-chat, gpt-4o-mini 等）"
         },
-        "l4ai.notesDir": {
+        "lfai.notesDir": {
           "type": "string",
-          "default": ".l4ai/daily",
+          "default": ".lfai/daily",
           "description": "学习笔记保存目录（相对于工作区根目录）"
         }
       }

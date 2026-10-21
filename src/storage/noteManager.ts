@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 import { DailyDigest } from '../types';
 
 export class NoteManager {
-  private static readonly STORAGE_KEY = 'l4ai_latest_digest';
+  private static readonly STORAGE_KEY = 'lfai_latest_digest';
 
   public static async saveDigest(
     context: vscode.ExtensionContext,
@@ -19,8 +19,8 @@ export class NoteManager {
       return null;
     }
 
-    const config = vscode.workspace.getConfiguration('l4ai');
-    const relDir = config.get<string>('notesDir', '.l4ai/daily');
+    const config = vscode.workspace.getConfiguration('lfai');
+    const relDir = config.get<string>('notesDir', '.lfai/daily');
     const targetDir = path.join(workspaceFolders[0].uri.fsPath, relDir);
 
     if (!fs.existsSync(targetDir)) {
@@ -41,18 +41,18 @@ export class NoteManager {
   public static async openTodayNote(): Promise<void> {
     const workspaceFolders = vscode.workspace.workspaceFolders;
     if (!workspaceFolders || workspaceFolders.length === 0) {
-      vscode.window.showWarningMessage('L4AI: 请在打开的工作区中执行此操作。');
+      vscode.window.showWarningMessage('LFAI: 请在打开的工作区中执行此操作。');
       return;
     }
 
     const today = new Date().toISOString().split('T')[0];
-    const config = vscode.workspace.getConfiguration('l4ai');
-    const relDir = config.get<string>('notesDir', '.l4ai/daily');
+    const config = vscode.workspace.getConfiguration('lfai');
+    const relDir = config.get<string>('notesDir', '.lfai/daily');
     const filePath = path.join(workspaceFolders[0].uri.fsPath, relDir, `${today}.md`);
 
     if (!fs.existsSync(filePath)) {
       vscode.window.showInformationMessage(
-        `L4AI: 今日笔记尚未生成，请先点击「提炼今日代码与 Codex 考点」。`
+        `LFAI: 今日笔记尚未生成，请先点击「提炼今日代码与 AI 考点」。`
       );
       return;
     }
@@ -63,7 +63,7 @@ export class NoteManager {
 
   private static formatDigestToMarkdown(digest: DailyDigest): string {
     const lines: string[] = [
-      `# 🧠 L4AI 每日代码学习复盘 (${digest.date})`,
+      `# 🧠 LFAI 每日代码学习复盘 (${digest.date})`,
       ``,
       `> **当日总结**：${digest.summary}`,
       `> **提炼卡片数**：${digest.totalCards} 张 | **生成时间**：${new Date().toLocaleTimeString()}`,
@@ -123,7 +123,7 @@ export class NoteManager {
       lines.push(``);
     });
 
-    lines.push(`*由 [Learning from AI (L4AI)](https://github.com/l4ai/learning-from-ai) 自动提炼生成*`);
+    lines.push(`*由 [Learning From AI (LFAI)](https://github.com/lfai/learning-from-ai) 自动提炼生成*`);
     return lines.join('\n');
   }
 }
