@@ -13,11 +13,11 @@
 </p>
 
 <p align="center">
-  <a href="https://marketplace.visualstudio.com/items?itemName=lfai-community.lfai">
-    <img src="https://img.shields.io/visual-studio-marketplace/v/lfai-community.lfai?style=flat-square&label=VS%20Marketplace&logo=visual-studio-code&color=007ACC" alt="VS Marketplace 版本"/>
+  <a href="https://marketplace.visualstudio.com/items?itemName=xixici.lfai">
+    <img src="https://img.shields.io/visual-studio-marketplace/v/xixici.lfai?style=flat-square&label=VS%20Marketplace&logo=visual-studio-code&color=007ACC" alt="VS Marketplace 版本"/>
   </a>
-  <a href="https://marketplace.visualstudio.com/items?itemName=lfai-community.lfai">
-    <img src="https://img.shields.io/visual-studio-marketplace/d/lfai-community.lfai?style=flat-square&color=007ACC&label=安装量" alt="安装量"/>
+  <a href="https://marketplace.visualstudio.com/items?itemName=xixici.lfai">
+    <img src="https://img.shields.io/visual-studio-marketplace/d/xixici.lfai?style=flat-square&color=007ACC&label=安装量" alt="安装量"/>
   </a>
   <a href="https://github.com/xixici/learning-from-ai/blob/main/LICENSE">
     <img src="https://img.shields.io/github/license/xixici/learning-from-ai?style=flat-square&color=brightgreen" alt="License: MIT"/>
