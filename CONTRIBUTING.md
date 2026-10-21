@@ -33,8 +33,8 @@ This project follows the [Contributor Covenant Code of Conduct](https://www.cont
 ### Setup
 
 ```bash
-git clone https://github.com/xixici/-learning-from-ai.git
-cd -learning-from-ai
+git clone https://github.com/xixici/learning-from-ai.git
+cd learning-from-ai
 npm install
 ```
 

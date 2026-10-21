@@ -19,14 +19,14 @@
   <a href="https://marketplace.visualstudio.com/items?itemName=lfai-community.lfai">
     <img src="https://img.shields.io/visual-studio-marketplace/d/lfai-community.lfai?style=flat-square&color=007ACC&label=Installs" alt="VS Marketplace Downloads"/>
   </a>
-  <a href="https://github.com/xixici/-learning-from-ai/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/xixici/-learning-from-ai?style=flat-square&color=brightgreen" alt="License: MIT"/>
+  <a href="https://github.com/xixici/learning-from-ai/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/xixici/learning-from-ai?style=flat-square&color=brightgreen" alt="License: MIT"/>
   </a>
-  <a href="https://github.com/xixici/-learning-from-ai/actions/workflows/ci.yml">
-    <img src="https://img.shields.io/github/actions/workflow/status/xixici/-learning-from-ai/ci.yml?branch=main&style=flat-square&label=CI&logo=github-actions" alt="CI Status"/>
+  <a href="https://github.com/xixici/learning-from-ai/actions/workflows/ci.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/xixici/learning-from-ai/ci.yml?branch=main&style=flat-square&label=CI&logo=github-actions" alt="CI Status"/>
   </a>
-  <a href="https://github.com/xixici/-learning-from-ai/releases">
-    <img src="https://img.shields.io/github/v/release/xixici/-learning-from-ai?style=flat-square&color=blueviolet&logo=github" alt="GitHub Release"/>
+  <a href="https://github.com/xixici/learning-from-ai/releases">
+    <img src="https://img.shields.io/github/v/release/xixici/learning-from-ai?style=flat-square&color=blueviolet&logo=github" alt="GitHub Release"/>
   </a>
 </p>
 
@@ -185,4 +185,4 @@ Open VS Code Settings (`Ctrl+,`) and search for `lfai`:
 
 ## 📄 License
 
-MIT © [LFAI Community](https://github.com/xixici/-learning-from-ai)
+MIT © [LFAI Community](https://github.com/xixici/learning-from-ai)

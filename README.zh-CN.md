@@ -19,14 +19,14 @@
   <a href="https://marketplace.visualstudio.com/items?itemName=lfai-community.lfai">
     <img src="https://img.shields.io/visual-studio-marketplace/d/lfai-community.lfai?style=flat-square&color=007ACC&label=安装量" alt="安装量"/>
   </a>
-  <a href="https://github.com/xixici/-learning-from-ai/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/xixici/-learning-from-ai?style=flat-square&color=brightgreen" alt="License: MIT"/>
+  <a href="https://github.com/xixici/learning-from-ai/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/xixici/learning-from-ai?style=flat-square&color=brightgreen" alt="License: MIT"/>
   </a>
-  <a href="https://github.com/xixici/-learning-from-ai/actions/workflows/ci.yml">
-    <img src="https://img.shields.io/github/actions/workflow/status/xixici/-learning-from-ai/ci.yml?branch=main&style=flat-square&label=CI&logo=github-actions" alt="CI 状态"/>
+  <a href="https://github.com/xixici/learning-from-ai/actions/workflows/ci.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/xixici/learning-from-ai/ci.yml?branch=main&style=flat-square&label=CI&logo=github-actions" alt="CI Status"/>
   </a>
-  <a href="https://github.com/xixici/-learning-from-ai/releases">
-    <img src="https://img.shields.io/github/v/release/xixici/-learning-from-ai?style=flat-square&color=blueviolet&logo=github" alt="最新发布"/>
+  <a href="https://github.com/xixici/learning-from-ai/releases">
+    <img src="https://img.shields.io/github/v/release/xixici/learning-from-ai?style=flat-square&color=blueviolet&logo=github" alt="最新发布"/>
   </a>
 </p>
 
@@ -138,4 +138,4 @@ code --install-extension lfai-0.1.0.vsix
 
 ## 📄 许可证
 
-MIT © [LFAI Community](https://github.com/xixici/-learning-from-ai)
+MIT © [LFAI Community](https://github.com/xixici/learning-from-ai)

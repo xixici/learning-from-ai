@@ -6,7 +6,7 @@
   "publisher": "lfai-community",
   "repository": {
     "type": "git",
-    "url": "https://github.com/xixici/-learning-from-ai.git"
+    "url": "https://github.com/xixici/learning-from-ai.git"
   },
   "engines": {
     "vscode": "^1.90.0"
