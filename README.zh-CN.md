@@ -46,6 +46,10 @@
 >
 > *直白、自然、纯粹。让 AI 负责生成代码，但确保你真正学懂背后的知识。*
 
+<p align="center">
+  <img src="resources/screenshot-main.png" alt="LFAI 每日代码学习复盘与侧边栏界面" width="100%"/>
+</p>
+
 ---
 
 ## 核心问题
@@ -110,7 +114,11 @@ code --install-extension lfai-0.1.1.vsix
 
 ## ⚙️ 配置说明
 
-打开 VS Code 设置（`Ctrl+,`），搜索 `lfai`：
+打开 VS Code 设置（`Ctrl+,`），搜索 `@ext:xixici.lfai` 或 `lfai`：
+
+<p align="center">
+  <img src="resources/screenshot-settings.png" alt="LFAI 扩展设置界面" width="100%"/>
+</p>
 
 | 配置项 | 默认值 | 说明 |
 |--------|--------|------|

@@ -47,6 +47,10 @@
 >
 > *Direct. Clear. Meaningful. Let AI write the boilerplate, but make sure YOU learn the craft.*
 
+<p align="center">
+  <img src="resources/screenshot-main.png" alt="LFAI Daily Review & Sidebar Interface" width="100%"/>
+</p>
+
 ---
 
 ## The Problem
@@ -147,7 +151,11 @@ Your Code Changes (Git Diff / Selection)
 
 ## ⚙️ Configuration
 
-Open VS Code Settings (`Ctrl+,`) and search for `lfai`:
+Open VS Code Settings (`Ctrl+,`) and search for `@ext:xixici.lfai`:
+
+<p align="center">
+  <img src="resources/screenshot-settings.png" alt="LFAI Extension Settings" width="100%"/>
+</p>
 
 | Setting | Default | Description |
 |---------|---------|-------------|
