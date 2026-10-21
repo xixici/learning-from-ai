@@ -16,6 +16,15 @@ This project adheres to [Semantic Versioning](https://semver.org/) and [Keep a C
 
 ---
 
+## [0.1.3] — 2026-10-21
+
+### Fixed
+- Fixed release naming convention in CI/CD pipeline to strictly use `🧠 LFAI <tag>`.
+- Corrected all community issue templates, conduct guidelines, and license references from legacy `l4ai` to official `LFAI`.
+- Streamlined GitHub Actions release packaging workflow to ensure automatic `.vsix` bundling and artifact attachment.
+
+---
+
 ## [0.1.2] — 2026-10-21
 
 ### Added
@@ -78,7 +87,8 @@ This project adheres to [Semantic Versioning](https://semver.org/) and [Keep a C
 
 ---
 
-[Unreleased]: https://github.com/xixici/learning-from-ai/compare/v0.1.2...HEAD
+[Unreleased]: https://github.com/xixici/learning-from-ai/compare/v0.1.3...HEAD
+[0.1.3]: https://github.com/xixici/learning-from-ai/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/xixici/learning-from-ai/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/xixici/learning-from-ai/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/xixici/learning-from-ai/releases/tag/v0.1.0
