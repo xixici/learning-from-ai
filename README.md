@@ -107,7 +107,7 @@ Right-click any code selection â†’ **"LFAI: Extract Learning from Selection"** â
 
 ### Install from VSIX (Manual)
 ```bash
-code --install-extension lfai-0.1.0.vsix
+code --install-extension lfai-0.1.1.vsix
 ```
 
 ### First Use

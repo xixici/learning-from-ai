@@ -16,6 +16,19 @@ This project adheres to [Semantic Versioning](https://semver.org/) and [Keep a C
 
 ---
 
+## [0.1.1] — 2026-10-21
+
+### Added
+- Official 512x512 neural brain icon extracted from banner design (`resources/icon.png`, `resources/icon.svg`).
+- Interactive Star History trend chart added to both English and Chinese READMEs.
+- High-resolution rendered banner asset for Marketplace compatibility.
+
+### Changed
+- Configured official publisher as `xixici`.
+- Updated all repository references and documentation to `xixici/learning-from-ai`.
+
+---
+
 ## [0.1.0] — 2026-10-21
 
 ### Added

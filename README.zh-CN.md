@@ -100,7 +100,7 @@ AI 编程工具（GitHub Copilot、Cursor、Claude Code 等）的普及带来了
 
 ### 手动 VSIX 安装
 ```bash
-code --install-extension lfai-0.1.0.vsix
+code --install-extension lfai-0.1.1.vsix
 ```
 
 ### 第一次使用
