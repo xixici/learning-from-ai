@@ -1,0 +1,18 @@
+name: Auto Label PRs
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  label:
+    name: Label PR by Title
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+
+    steps:
+      - uses: actions/labeler@v5
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          configuration-path: .github/labeler.yml

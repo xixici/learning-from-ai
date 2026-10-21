@@ -1,0 +1,38 @@
+# Auto-labeler configuration
+# Docs: https://github.com/actions/labeler
+
+"type: feature":
+  - head-branch: ["^feat/", "^feature/"]
+
+"type: bug":
+  - head-branch: ["^fix/", "^bugfix/", "^hotfix/"]
+
+"type: docs":
+  - head-branch: ["^docs/"]
+  - changed-files:
+    - any-glob-to-any-file: ["*.md", "docs/**"]
+
+"type: chore":
+  - head-branch: ["^chore/", "^refactor/"]
+  - changed-files:
+    - any-glob-to-any-file: [".github/**", "*.json", "*.yml", "*.yaml", "esbuild.js", "tsconfig.json"]
+
+"area: ui":
+  - changed-files:
+    - any-glob-to-any-file: ["src/ui/**"]
+
+"area: engine":
+  - changed-files:
+    - any-glob-to-any-file: ["src/engine/**"]
+
+"area: collector":
+  - changed-files:
+    - any-glob-to-any-file: ["src/collector/**"]
+
+"area: storage":
+  - changed-files:
+    - any-glob-to-any-file: ["src/storage/**"]
+
+"area: ci/cd":
+  - changed-files:
+    - any-glob-to-any-file: [".github/workflows/**"]

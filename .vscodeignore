@@ -1,9 +1,20 @@
-.vscode/**
-.vscode-test/**
+# Source files (bundled by esbuild into dist/)
 src/**
 tsconfig.json
 esbuild.js
+
+# Development only
+.vscode/**
+.vscode-test/**
 node_modules/**
+
+# Build artifacts that should NOT be in the VSIX
 *.vsix
 .l4ai/**
 .git/**
+.github/**
+
+# Misc
+*.log
+.DS_Store
+Thumbs.db

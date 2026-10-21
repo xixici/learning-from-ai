@@ -1,0 +1,81 @@
+name: 💡 Feature Request
+description: Suggest a new feature or enhancement for L4AI
+title: "[Feature]: "
+labels: ["enhancement", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping make L4AI better! Please describe your feature request in as much detail as possible.
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Pre-flight checklist
+      options:
+        - label: I have searched existing issues and this feature has not been requested before
+          required: true
+        - label: I have checked the [Roadmap section in README](../../README.md#️-roadmap) and this is not already planned
+          required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / Motivation
+      description: What problem are you trying to solve? What's missing in the current experience?
+      placeholder: |
+        I often finish a coding session and forget to run the extraction command. I'd love an automatic reminder...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the feature you'd like to see.
+      placeholder: |
+        A setting to automatically trigger extraction when VS Code loses focus after a configurable period of inactivity (e.g., 30 minutes). Show a status bar notification with a dismiss option.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Feature Category
+      options:
+        - Learning & Extraction (LLM/AI core)
+        - UI / Sidebar / UX
+        - Knowledge Base / Markdown / Export
+        - Configuration / Settings
+        - Git / Code Collection
+        - Performance / Build
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: How important is this to you?
+      options:
+        - Critical — blocks my adoption of L4AI
+        - High — would significantly improve my workflow
+        - Medium — nice to have
+        - Low — minor quality-of-life improvement
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Have you found any workarounds or alternative approaches?
+      placeholder: I currently set a manual reminder in my calendar, but it's easy to forget...
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Mockups, screenshots, references to similar features in other tools, etc.

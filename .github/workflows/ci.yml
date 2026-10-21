@@ -1,0 +1,132 @@
+name: CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ─────────────────────────────────────────────────────────
+  # Job 1: Build & Type Check
+  # ─────────────────────────────────────────────────────────
+  build:
+    name: Build & Type Check
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20.x, 22.x]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript type check
+        run: npm run compile
+
+      - name: Production build (esbuild)
+        run: npm run package
+
+      - name: Verify dist output
+        run: |
+          if [ ! -f dist/extension.js ]; then
+            echo "❌ dist/extension.js not found!"
+            exit 1
+          fi
+          echo "✅ dist/extension.js exists ($(du -sh dist/extension.js | cut -f1))"
+
+      - name: Upload build artifact
+        if: matrix.node-version == '22.x'
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-build
+          path: dist/
+          retention-days: 7
+
+  # ─────────────────────────────────────────────────────────
+  # Job 2: Package VSIX (only on main branch or PRs to main)
+  # ─────────────────────────────────────────────────────────
+  package:
+    name: Package VSIX
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main' || github.base_ref == 'main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Package VSIX
+        run: npm run package:vsix
+
+      - name: Get VSIX filename
+        id: vsix
+        run: echo "filename=$(ls *.vsix)" >> $GITHUB_OUTPUT
+
+      - name: Upload VSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vsix-package
+          path: ${{ steps.vsix.outputs.filename }}
+          retention-days: 30
+
+      - name: Report VSIX size
+        run: |
+          SIZE=$(du -sh *.vsix | cut -f1)
+          echo "### 📦 VSIX Package" >> $GITHUB_STEP_SUMMARY
+          echo "- **File**: ${{ steps.vsix.outputs.filename }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Size**: $SIZE" >> $GITHUB_STEP_SUMMARY
+
+  # ─────────────────────────────────────────────────────────
+  # Job 3: Lint commit messages (PR only)
+  # ─────────────────────────────────────────────────────────
+  commitlint:
+    name: Lint Commit Messages
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+
+      - name: Install commitlint
+        run: npm install -g @commitlint/cli @commitlint/config-conventional
+
+      - name: Validate PR commit messages
+        run: |
+          git log --oneline origin/${{ github.base_ref }}..HEAD
+          npx commitlint \
+            --from origin/${{ github.base_ref }} \
+            --to HEAD \
+            --verbose \
+            --config '{"extends":["@commitlint/config-conventional"]}'

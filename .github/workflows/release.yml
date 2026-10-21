@@ -1,0 +1,209 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'      # e.g. v0.1.0, v1.2.3
+      - 'v[0-9]+.[0-9]+.[0-9]+-*'    # e.g. v0.2.0-beta.1
+
+permissions:
+  contents: write   # for creating GitHub Releases
+
+jobs:
+  # ─────────────────────────────────────────────────────────
+  # Job 1: Validate tag matches package.json version
+  # ─────────────────────────────────────────────────────────
+  validate:
+    name: Validate Version
+    runs-on: ubuntu-latest
+
+    outputs:
+      version: ${{ steps.get-version.outputs.version }}
+      tag: ${{ steps.get-tag.outputs.tag }}
+      is_prerelease: ${{ steps.check-prerelease.outputs.is_prerelease }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get tag name
+        id: get-tag
+        run: echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Get package.json version
+        id: get-version
+        run: echo "version=v$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
+      - name: Check prerelease
+        id: check-prerelease
+        run: |
+          if [[ "${{ steps.get-tag.outputs.tag }}" == *"-"* ]]; then
+            echo "is_prerelease=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_prerelease=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Verify tag matches package.json
+        run: |
+          TAG="${{ steps.get-tag.outputs.tag }}"
+          PKG_VERSION="${{ steps.get-version.outputs.version }}"
+          if [ "$TAG" != "$PKG_VERSION" ]; then
+            echo "❌ Tag ($TAG) does not match package.json version ($PKG_VERSION)"
+            exit 1
+          fi
+          echo "✅ Tag $TAG matches package.json"
+
+  # ─────────────────────────────────────────────────────────
+  # Job 2: Build & Package VSIX
+  # ─────────────────────────────────────────────────────────
+  build-and-package:
+    name: Build & Package VSIX
+    runs-on: ubuntu-latest
+    needs: validate
+
+    outputs:
+      vsix-name: ${{ steps.vsix.outputs.filename }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run compile
+
+      - name: Production build
+        run: npm run package
+
+      - name: Package VSIX
+        run: npm run package:vsix
+
+      - name: Get VSIX filename
+        id: vsix
+        run: echo "filename=$(ls *.vsix)" >> $GITHUB_OUTPUT
+
+      - name: Upload VSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vsix-release
+          path: ${{ steps.vsix.outputs.filename }}
+
+  # ─────────────────────────────────────────────────────────
+  # Job 3: Create GitHub Release
+  # ─────────────────────────────────────────────────────────
+  github-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [validate, build-and-package]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download VSIX artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: vsix-release
+
+      - name: Extract changelog for this version
+        id: changelog
+        run: |
+          VERSION="${{ needs.validate.outputs.tag }}"
+          # Extract section between this version header and the next
+          NOTES=$(awk "/^## \[${VERSION#v}\]/,/^## \[/" CHANGELOG.md \
+                  | head -n -1 \
+                  | tail -n +2)
+          if [ -z "$NOTES" ]; then
+            NOTES="See [CHANGELOG.md](https://github.com/l4ai/learning-from-ai/blob/main/CHANGELOG.md) for details."
+          fi
+          {
+            echo "notes<<EOF"
+            echo "$NOTES"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.validate.outputs.tag }}
+          name: "🧠 L4AI ${{ needs.validate.outputs.tag }}"
+          prerelease: ${{ needs.validate.outputs.is_prerelease }}
+          body: |
+            ## What's Changed
+
+            ${{ steps.changelog.outputs.notes }}
+
+            ---
+
+            ## 📦 Installation
+
+            ### Option A — VS Code Marketplace *(Recommended)*
+            Search for **"Learning from AI"** in the Extensions panel (`Ctrl+Shift+X`).
+
+            ### Option B — Manual VSIX Install
+            Download the `.vsix` file below, then run:
+            ```bash
+            code --install-extension ${{ needs.build-and-package.outputs.vsix-name }}
+            ```
+
+            ---
+
+            **Full Changelog**: https://github.com/l4ai/learning-from-ai/blob/main/CHANGELOG.md
+          files: |
+            ${{ needs.build-and-package.outputs.vsix-name }}
+
+  # ─────────────────────────────────────────────────────────
+  # Job 4: Publish to VS Code Marketplace
+  # (requires VSCE_PAT secret — skip if not configured)
+  # ─────────────────────────────────────────────────────────
+  publish-marketplace:
+    name: Publish to VS Marketplace
+    runs-on: ubuntu-latest
+    needs: [validate, build-and-package, github-release]
+    # Only publish stable releases (not pre-releases)
+    if: needs.validate.outputs.is_prerelease == 'false'
+    environment: marketplace  # Optional: add approval gate in GitHub Environments
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download VSIX artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: vsix-release
+
+      - name: Publish to VS Code Marketplace
+        if: env.VSCE_PAT != ''
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: |
+          VSIX_FILE=$(ls *.vsix)
+          echo "Publishing $VSIX_FILE to VS Code Marketplace..."
+          npx @vscode/vsce publish --pat "$VSCE_PAT" --packagePath "$VSIX_FILE"
+          echo "✅ Published successfully!"
+
+      - name: Skip marketplace publish (no PAT configured)
+        if: env.VSCE_PAT == ''
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: |
+          echo "⚠️  VSCE_PAT secret not configured — skipping marketplace publish."
+          echo "To enable: add VSCE_PAT to repository secrets."

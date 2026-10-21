@@ -1,0 +1,122 @@
+name: 🐛 Bug Report
+description: Report a bug or unexpected behavior in L4AI
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill in as much detail as possible to help us fix it quickly.
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Pre-flight checklist
+      options:
+        - label: I have searched existing issues and this is not a duplicate
+          required: true
+        - label: I have read the [README](../../README.md) and confirmed this is not expected behavior
+          required: true
+
+  - type: input
+    id: extension-version
+    attributes:
+      label: L4AI Extension Version
+      description: Found in VS Code Extensions panel (`Ctrl+Shift+X`)
+      placeholder: e.g. 0.1.0
+    validations:
+      required: true
+
+  - type: input
+    id: vscode-version
+    attributes:
+      label: VS Code Version
+      description: Found in Help → About
+      placeholder: e.g. 1.94.2
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating System
+      options:
+        - Windows 11
+        - Windows 10
+        - macOS (Apple Silicon)
+        - macOS (Intel)
+        - Linux (Ubuntu/Debian)
+        - Linux (Other)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: llm-provider
+    attributes:
+      label: LLM Provider
+      description: Which provider are you using?
+      options:
+        - vscode.lm (GitHub Copilot)
+        - Custom API (DeepSeek)
+        - Custom API (OpenAI)
+        - Custom API (Ollama / local)
+        - Custom API (Other)
+        - Not configured / using demo cards
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is.
+      placeholder: When I click "Extract Today's Learnings", nothing happens and I see no notification...
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Exact steps to reproduce the behavior.
+      placeholder: |
+        1. Open a workspace with uncommitted changes
+        2. Press Ctrl+Shift+P → "L4AI: Extract Today's Learnings"
+        3. See error / no output
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      placeholder: A notification should appear with the card count, and the sidebar should update.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      placeholder: Nothing happens. No notification, no sidebar update.
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Developer Console Logs
+      description: |
+        Open **Help → Toggle Developer Tools → Console** in VS Code and paste any L4AI-related errors here.
+      render: text
+      placeholder: |
+        [L4AI] Error: ...
+        TypeError: Cannot read properties of undefined...
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Screenshots, screen recordings, or any other relevant information.
