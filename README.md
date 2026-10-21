@@ -14,7 +14,7 @@
 
 <p align="center">
   <a href="https://marketplace.visualstudio.com/items?itemName=xixici.lfai">
-    <img src="https://img.shields.io/badge/VS_Marketplace-v0.1.1-007ACC?style=flat-square&logo=visual-studio-code" alt="VS Marketplace Version"/>
+    <img src="https://img.shields.io/badge/VS_Marketplace-v0.1.2-007ACC?style=flat-square&logo=visual-studio-code" alt="VS Marketplace Version"/>
   </a>
   <a href="https://github.com/xixici/learning-from-ai/releases">
     <img src="https://img.shields.io/github/v/release/xixici/learning-from-ai?style=flat-square&color=blueviolet&logo=github" alt="GitHub Release"/>
@@ -67,30 +67,34 @@ Every day, AI writes thousands of lines you accept without truly understanding �
 
 ## ✨ Features
 
+### ⚡ Dual-Engine Workflow: Work Delivery + Tech Growth
+LFAI recognizes that developers don't need another chore at 6 PM. It bridges work and learning seamlessly:
+- **For Work (Public Standup & PR)**: Automatically distills today's engineering changes into 3-5 high-signal bullet points. One click on **"📋 Copy Standup/PR"** copies a clean markdown summary ready for your daily standup, team report, or GitHub PR description.
+- **For Growth (Private Knowledge Base)**: Drops all boilerplate and filters out boring CRUD to extract high-density technical cards into your personal knowledge base.
+
+### 🎯 Staff-Level Deep Probing Pillars
+Unlike generic code commentators that parrot what the code literally does, LFAI enforces negative filters (no basic syntax, no CRUD storytelling) and applies 4 probing dimensions:
+- 💡 **The Why (机制剖析)**: Behind-the-scenes architectural intent — why choose this specific pattern or data flow over naive approaches?
+- ⚠️ **Destructive Test (破坏性推演)**: What breaks if you delete this line of defensive code? Under what extreme concurrency, race conditions, or unexpected inputs will it silently crash?
+- 📖 **Deep Mechanics (底层原理)**: Event loop microtasks, V8 optimizations, buffer overflow limits, and framework internals.
+- ✨ **Best Practices (生产级实践)**: Production trade-offs and modern modern language idioms.
+- ❓ **Active Recall Quiz (实战拷问)**: Interactive Anki-style quiz testing real mental models with reveal-on-demand explanations.
+
 ### 🔍 Automatic Daily Code Digest
 Scans today's Git incremental changes, filters noise (lockfiles, build artifacts, formatting-only diffs), and surfaces the real learning signal.
 
-### 🧩 4-Dimensional Learning Cards
-
-| Card Type | What it captures |
-|-----------|-----------------|
-| 💡 **Syntax & Idioms** | Language features, advanced APIs, and patterns you used but might not fully grasp |
-| 🏗️ **Architecture & Trade-offs** | Why the code is structured this way — decisions and their consequences |
-| ⚠️ **Gotchas & Edge Cases** | Hidden guard clauses, race conditions, and silent risks in AI-generated code |
-| ❓ **Active Recall Quiz** | Anki-style Q&A with hints and detailed explanations — so you verify you actually know it |
-
 ### 🖥️ Native VS Code Sidebar Panel
-
-- Filter cards by category with one click
-- Expand/collapse deep-dive explanations on demand
+- Filter cards by category with one click (Gotchas, Architecture, Syntax, Quiz)
+- One-click copy for daily standup / PR deliverables
+- Expandable deep-dive blocks (The Why, Destructive Test, Best Practices)
 - Interactive quiz mode with reveal-on-demand answers
 - Copy code snippets directly to clipboard
 
 ### 📝 Markdown Knowledge Base
-Every daily digest auto-saves to `.lfai/daily/YYYY-MM-DD.md` — plain Markdown, compatible with **Obsidian**, **Logseq**, **Notion**, and any note-taking tool.
+Every daily digest auto-saves to `.lfai/daily/YYYY-MM-DD.md` — cleanly organized with a **Work Deliverables** section and a **Technical Deep Dive** section. Compatible with **Obsidian**, **Logseq**, **Notion**, and any markdown note-taking tool.
 
 ### 🤖 Zero-Config LLM Support
-- **VS Code LM API** (default): Uses your existing GitHub Copilot subscription — no API key needed
+- **VS Code LM API** (default): Uses your existing GitHub Copilot subscription — zero API key required
 - **Custom LLM**: DeepSeek, OpenAI, Claude, or any local Ollama endpoint
 
 ### ✂️ Selection-Based Instant Learning
@@ -108,14 +112,15 @@ Right-click any code selection → **"LFAI: Extract Learning from Selection"** �
 
 ### Install from VSIX (Manual)
 ```bash
-code --install-extension lfai-0.1.1.vsix
+code --install-extension lfai-0.1.2.vsix
 ```
 
 ### First Use
 1. Open any project with code changes
 2. Press `Ctrl+Shift+P` → **`LFAI: Extract Today's Learnings`**
-3. Check the sidebar (brain icon in Activity Bar) for today's cards
-4. Find your Markdown notes in `.lfai/daily/`
+3. Click **"📋 Copy Standup/PR"** to paste your daily report in 5 seconds
+4. Check the sidebar (brain icon in Activity Bar) for today's deep-dive learning cards
+5. Find your Markdown notes in `.lfai/daily/`
 
 ---
 
@@ -171,7 +176,8 @@ Open VS Code Settings (`Ctrl+,`) and search for `@ext:xixici.lfai`:
 
 | Command | Description |
 |---------|-------------|
-| `LFAI: Extract Today's Learnings` | Analyze today's git diff and generate learning cards |
+| `LFAI: Extract Today's Learnings` | Analyze today's git diff and generate learning cards & standup |
+| `LFAI: Copy Today's Work Summary & Standup` | Copy formatted daily standup / PR description to clipboard |
 | `LFAI: Extract Learning from Selection` | Deep-dive analysis of selected code snippet |
 | `LFAI: Open Today's Note` | Open today's Markdown digest file |
 | `LFAI: Refresh Sidebar` | Reload the sidebar panel |
@@ -180,11 +186,12 @@ Open VS Code Settings (`Ctrl+,`) and search for `@ext:xixici.lfai`:
 
 ## 🗺️ Roadmap
 
-- [x] **v0.1** — Core extraction engine, sidebar UI, Markdown export
-- [ ] **v0.2** — Spaced repetition (SM-2) scheduler, daily review reminders
-- [ ] **v0.3** — Anki `.apkg` export, Obsidian plugin sync
-- [ ] **v0.4** — Knowledge growth heatmap calendar
-- [ ] **v0.5** — Team mode: share learning cards across a shared workspace
+- [x] **v0.1.0** — Core extraction engine, sidebar UI, Markdown export
+- [x] **v0.1.2** — Dual-engine work delivery & standup copy, Staff-level deep probing prompt architecture, destructive test analysis
+- [ ] **v0.2.0** — Spaced repetition (SM-2) scheduler, daily micro-quiz reminders
+- [ ] **v0.3.0** — Anki `.apkg` export, Obsidian plugin sync
+- [ ] **v0.4.0** — Knowledge growth heatmap calendar
+- [ ] **v0.5.0** — Team mode: share learning cards across a shared workspace
 
 ---
 

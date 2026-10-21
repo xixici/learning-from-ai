@@ -16,6 +16,28 @@ This project adheres to [Semantic Versioning](https://semver.org/) and [Keep a C
 
 ---
 
+## [0.1.2] — 2026-10-21
+
+### Added
+- **Dual-Engine Work & Learning Paradigm (双轨驱动工作流)**:
+  - **Work Deliverables (Standup & PR Ready)**: Automatically summarizes today's completed engineering milestones into 3-5 bullet points ready for daily standups, team reports, or PR descriptions.
+  - **New Command**: `LFAI: 复制今日工作交付与 Standup 到剪贴板` (`lfai.copyDailyStandup`).
+  - **Quick Action**: Added `📋 复制日报/PR` button directly inside the VS Code sidebar header.
+- **Deep Probing Prompt Architecture (深水区架构级探针)**:
+  - Completely overhauled LLM extraction prompt with Staff Engineer quality rubrics and strict negative constraints (discarding trivial CRUD and basic syntax explanations).
+  - Every card now extracts **💡 机制剖析 (The Why)**, **⚠️ 破坏性推演 (Destructive Test / What if removed)**, and **✨ 最佳实践建议 (Best Practice)**.
+  - Enhanced Active Recall Quiz with real-world failure mode reasoning and architectural trade-offs.
+- **Interactive UI & Dual-Track Markdown**:
+  - Collapsible **Work Deliverables** block in the sidebar.
+  - Multi-section deep-dive toggle revealing The Why, Destructive Test, and Best Practices.
+  - Clean separation in Markdown notes between public work deliverables and private personal learning assets.
+
+### Changed
+- Refined badge endpoints and added official extension screenshots in documentation.
+- Defaulted sub-process execution buffer to 10MB to handle large repository diffs reliably.
+
+---
+
 ## [0.1.1] — 2026-10-21
 
 ### Added

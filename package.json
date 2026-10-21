@@ -2,7 +2,7 @@
   "name": "lfai",
   "displayName": "LFAI — Learning From AI",
   "description": "从每日代码变更与 AI 交互中提炼核心考点、架构权衡与自测卡片，告别 AI 时代技能空心化。",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "publisher": "xixici",
   "icon": "resources/icon.png",
   "repository": {

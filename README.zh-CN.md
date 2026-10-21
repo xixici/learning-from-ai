@@ -14,7 +14,7 @@
 
 <p align="center">
   <a href="https://marketplace.visualstudio.com/items?itemName=xixici.lfai">
-    <img src="https://img.shields.io/badge/VS_Marketplace-v0.1.1-007ACC?style=flat-square&logo=visual-studio-code" alt="VS Marketplace 版本"/>
+    <img src="https://img.shields.io/badge/VS_Marketplace-v0.1.2-007ACC?style=flat-square&logo=visual-studio-code" alt="VS Marketplace 版本"/>
   </a>
   <a href="https://github.com/xixici/learning-from-ai/releases">
     <img src="https://img.shields.io/github/v/release/xixici/learning-from-ai?style=flat-square&color=blueviolet&logo=github" alt="最新发布"/>
@@ -66,27 +66,31 @@ AI 编程工具（GitHub Copilot、Cursor、Claude Code 等）的普及带来了
 
 ## ✨ 核心功能
 
+### ⚡ 双轨驱动工作流：对公交付 + 对私成长
+学习不该成为下班后的额外负担。LFAI 通过双轨输出打破“反人性”的学习困境：
+- **对公交付（Standup & PR Ready）**：自动提炼出今日完成的 3~5 项高密度工程交付事项。点击侧边栏 **`📋 复制日报/PR`**，即可直接粘贴到团队每日站会群、工作日报或 GitHub PR 描述中，秒省 15 分钟写总结的时间。
+- **对私成长（个人技术资产）**：严格过滤平庸的业务 CRUD，专注于捕获冰山底层的机制剖析与防御性推演。
+
+### 🎯 架构师级深水区探针（拒斥流水账）
+普通的 AI 解说往往只是“把代码字面意思复述一遍”。LFAI 设立严格负向过滤红线，并采用三大认知探针进行提炼：
+- 💡 **机制剖析 (The Why)**：AI 为什么选用这一模式或数据流？与直觉/传统写法相比，消除了哪些隐式状态或并发锁隐患？
+- ⚠️ **破坏性推演 (Destructive Test)**：如果把这行防御性代码或配置删掉，系统会在何种极端高并发、边界输入或时序竞态下静默崩溃？
+- 📖 **深度底层机制**：解析事件循环微任务、V8 优化原理、子进程缓冲机制与框架内部实现。
+- ✨ **现代最佳实践**：生产环境中的架构权衡方案与语言现代惯用法。
+- ❓ **实战自测拷问 (Active Recall)**：包含思考提示与按需折叠标准答案的 Anki 风格互动考题。
+
 ### 🔍 今日代码自动收集
 自动扫描当天 Git 增量变更，智能过滤锁文件、构建产物、纯格式化提交等噪声，只提取真正有学习价值的代码信号。
 
-### 🧩 四维立体学习卡片
-
-| 卡片类型 | 提炼内容 |
-|---------|---------|
-| 💡 **语法与惯用法** | 你用了但可能没真正吃透的语言特性、高级 API 与编程模式 |
-| 🏗️ **架构与权衡** | 代码为什么这样组织——设计决策背后的逻辑与代价 |
-| ⚠️ **踩坑与边界防护** | AI 生成代码中隐藏的竞态条件、异常防护与遗漏的边界处理 |
-| ❓ **主动回忆自测** | Anki 风格的问答卡片，含提示与深度解析，用于检验真实掌握程度 |
-
 ### 🖥️ 原生 VS Code 侧边栏看板
-
-- 按分类一键过滤卡片
-- 折叠/展开深度原理剖析，按需获取
+- 按分类一键过滤卡片（避坑、架构、语法、自测）
+- 顶部集成今日工作交付折叠卡与 **`📋 复制日报/PR`** 快捷操作
+- 折叠/展开深度原理剖析与破坏性推演
 - 交互式问答模式，答案按需揭示
 - 直接复制代码切片至剪贴板
 
 ### 📝 Markdown 知识库沉淀
-每日复盘记录自动保存为 `.lfai/daily/YYYY-MM-DD.md` 标准 Markdown 文件，天然兼容 **Obsidian**、**Logseq**、**Notion** 等任意笔记工具。
+每日复盘记录自动保存为 `.lfai/daily/YYYY-MM-DD.md` 标准 Markdown 文件，分为**「今日工作交付」**与**「核心技术内参」**两大板块，天然兼容 **Obsidian**、**Logseq**、**Notion** 等任意笔记工具。
 
 ### 🤖 零门槛双通道模型接入
 - **VS Code LM API**（默认）：直接复用已有的 GitHub Copilot 订阅，无需任何额外配置
@@ -101,14 +105,15 @@ AI 编程工具（GitHub Copilot、Cursor、Claude Code 等）的普及带来了
 
 ### 手动 VSIX 安装
 ```bash
-code --install-extension lfai-0.1.1.vsix
+code --install-extension lfai-0.1.2.vsix
 ```
 
 ### 第一次使用
 1. 打开任意有代码变更的项目
 2. 按 `Ctrl+Shift+P` → **`LFAI: 提炼今日代码与 AI 考点`**
-3. 在侧边栏（活动栏大脑图标）查看今日卡片
-4. 在 `.lfai/daily/` 目录下找到自动生成的 Markdown 笔记
+3. 点击 **`📋 复制日报/Standup`**，5 秒完成今日工作汇报
+4. 在侧边栏（活动栏大脑图标）查看今日深度原理卡片
+5. 在 `.lfai/daily/` 目录下找到自动生成的 Markdown 复盘文件
 
 ---
 
@@ -134,7 +139,8 @@ code --install-extension lfai-0.1.1.vsix
 
 | 命令 | 说明 |
 |------|------|
-| `LFAI: 提炼今日代码与 AI 考点` | 分析今日 Git 变更并生成学习卡片 |
+| `LFAI: 提炼今日代码与 AI 考点` | 分析今日 Git 变更并生成学习卡片与工作交付总结 |
+| `LFAI: 复制今日工作交付与 Standup 到剪贴板` | 一键将格式化好的 Standup / 日报 / PR 总结复制到剪贴板 |
 | `LFAI: 提炼当前选中代码深度原理` | 对选中代码片段进行即时深度剖析 |
 | `LFAI: 打开今日学习笔记` | 打开今日自动生成的 Markdown 复盘文件 |
 | `LFAI: 刷新今日学习看板` | 重新加载侧边栏面板 |
@@ -143,11 +149,12 @@ code --install-extension lfai-0.1.1.vsix
 
 ## 🗺️ 开发路线图
 
-- [x] **v0.1** — 核心提炼引擎、侧边栏交互看板、Markdown 自动归档
-- [ ] **v0.2** — 间隔重复调度器（SM-2 算法）、每日复习提醒
-- [ ] **v0.3** — Anki `.apkg` 导出、Obsidian 插件双向同步
-- [ ] **v0.4** — 知识成长热力图日历
-- [ ] **v0.5** — 团队模式：在工作区内共享学习卡片
+- [x] **v0.1.0** — 核心提炼引擎、侧边栏交互看板、Markdown 自动归档
+- [x] **v0.1.2** — 双轨驱动工作流（日报/Standup 一键复制）、架构师级深水区探针、破坏性推演分析
+- [ ] **v0.2.0** — 间隔重复调度器（SM-2 算法）、每日复习微测验
+- [ ] **v0.3.0** — Anki `.apkg` 导出、Obsidian 插件双向同步
+- [ ] **v0.4.0** — 知识成长热力图日历
+- [ ] **v0.5.0** — 团队模式：在工作区内共享学习卡片
 
 ---
 
