@@ -4,6 +4,7 @@
   "description": "从每日代码变更与 AI 交互中提炼核心考点、架构权衡与自测卡片，告别 AI 时代技能空心化。",
   "version": "0.1.0",
   "publisher": "xixici",
+  "icon": "resources/icon.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/xixici/learning-from-ai.git"
