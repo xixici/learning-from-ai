@@ -35,6 +35,10 @@
   <a href="./CHANGELOG.md">Changelog</a>
 </p>
 
+<p align="center">
+  <a href="README.zh-CN.md">🇨🇳 中文文档</a> | <strong>🇺🇸 English</strong>
+</p>
+
 ---
 
 ## The Problem
