@@ -1,4 +1,4 @@
-# Contributing to Learning from AI (L4AI)
+# Contributing to L4AI — Learning for the AI Era
 
 Thank you for your interest in contributing! This document covers everything you need to get started.
 
@@ -33,8 +33,8 @@ This project follows the [Contributor Covenant Code of Conduct](https://www.cont
 ### Setup
 
 ```bash
-git clone https://github.com/l4ai/learning-from-ai.git
-cd learning-from-ai
+git clone https://github.com/l4ai/learning-for-the-ai-era.git
+cd learning-for-the-ai-era
 npm install
 ```
 

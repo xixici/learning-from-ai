@@ -1,11 +1,15 @@
 <p align="center">
-  <img src="resources/banner.png" alt="Learning from AI (L4AI) Banner" width="640"/>
+  <img src="resources/banner.png" alt="L4AI — 为 AI 时代而学习" width="640"/>
 </p>
 
-<h1 align="center">🧠 Learning from AI — L4AI</h1>
+<h1 align="center">🧠 L4AI</h1>
 
 <p align="center">
-  <strong>别让 AI 替你写走了你的知识。从它写的每一行代码里，真正学到东西。</strong>
+  <b>Learning for the AI Era · 为 AI 时代而学习</b>
+</p>
+
+<p align="center">
+  用 AI 更快地交付，同时真正学到东西。
 </p>
 
 <p align="center">
@@ -15,50 +19,57 @@
   <a href="https://marketplace.visualstudio.com/items?itemName=l4ai-community.learning-from-ai">
     <img src="https://img.shields.io/visual-studio-marketplace/d/l4ai-community.learning-from-ai?style=flat-square&color=007ACC&label=安装量" alt="安装量"/>
   </a>
-  <a href="https://github.com/l4ai/learning-from-ai/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/l4ai/learning-from-ai?style=flat-square&color=brightgreen" alt="License: MIT"/>
+  <a href="https://github.com/l4ai/learning-for-the-ai-era/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/l4ai/learning-for-the-ai-era?style=flat-square&color=brightgreen" alt="License: MIT"/>
   </a>
-  <a href="https://github.com/l4ai/learning-from-ai/actions/workflows/ci.yml">
-    <img src="https://img.shields.io/github/actions/workflow/status/l4ai/learning-from-ai/ci.yml?branch=main&style=flat-square&label=CI&logo=github-actions" alt="CI 状态"/>
+  <a href="https://github.com/l4ai/learning-for-the-ai-era/actions/workflows/ci.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/l4ai/learning-for-the-ai-era/ci.yml?branch=main&style=flat-square&label=CI&logo=github-actions" alt="CI 状态"/>
   </a>
-  <a href="https://github.com/l4ai/learning-from-ai/releases">
-    <img src="https://img.shields.io/github/v/release/l4ai/learning-from-ai?style=flat-square&color=blueviolet&logo=github" alt="最新发布"/>
+  <a href="https://github.com/l4ai/learning-for-the-ai-era/releases">
+    <img src="https://img.shields.io/github/v/release/l4ai/learning-for-the-ai-era?style=flat-square&color=blueviolet&logo=github" alt="最新发布"/>
   </a>
 </p>
 
 <p align="center">
-  <a href="README.md">English</a> •
-  <a href="#-核心问题">核心问题</a> •
-  <a href="#-核心功能">核心功能</a> •
-  <a href="#-快速开始">快速开始</a> •
-  <a href="#-工作原理">工作原理</a> •
-  <a href="#-配置说明">配置说明</a> •
-  <a href="#-参与贡献">参与贡献</a> •
+  <strong>🇨🇳 中文文档</strong> | <a href="README.md">🇺🇸 English</a>
+</p>
+
+<p align="center">
+  <a href="#核心问题">核心问题</a> •
+  <a href="#核心功能">核心功能</a> •
+  <a href="#快速开始">快速开始</a> •
+  <a href="#工作原理">工作原理</a> •
+  <a href="#配置说明">配置说明</a> •
+  <a href="#参与贡献">参与贡献</a> •
   <a href="./CHANGELOG.md">更新日志</a>
 </p>
 
 ---
 
+> **L4AI** = **L**earning **4**[for] the **AI** era — 为 AI 时代而学习
+>
+> *「4」不是笔误，是一种表态。就像 `i18n`、`a11y`、`w3c`，它是一种意图的压缩：我们在为与 AI 并肩编程、同时依然渴望持续成长的开发者而构建。*
+
+---
+
 ## 核心问题
 
-AI 编程工具（GitHub Copilot、Cursor、Claude Code 等）的普及带来了一个隐性悖论：
+AI 编程工具（GitHub Copilot、Cursor、Claude Code 等）的普及带来了一个无声的悖论：
 
-> **你的交付速度提升了，但你的成长速度却在下降。**
+> **你交付得更快了，但你成长得更慢了。**
 
-每一天，AI 帮你写下数以千行的代码——复杂的异步模式、精妙的架构决策、隐藏的边界防护——而你只是按下了"接受"。三天后面对类似场景，你依然无从下手，无法独立复现，更无法深度调试。
+每一天，AI 帮你写下数以千行的代码——复杂的异步模式、精妙的架构决策、隐藏的边界防护——而你只是按下"接受"。三天后面对类似的场景，你依然无从下手，无法独立复现，更无法深度调试。
 
-**这种技能空心化是无声的、累积性的。**
+这不是懒惰。**这是 AI 时代工作流中的一个结构性缺口**——在代码被合并之前，没有任何环节强制要求你真正理解它。
 
-## 解决方案
-
-**L4AI** 是一个 VS Code 插件，它能把你每天 AI 辅助写出的代码，自动转化为属于你自己的个性化学习卡片。它挂钩你的 Git 变更与工作区上下文，借助大模型推理，精准提炼出 **你今天的代码** 里，**你个人** 最需要学习的内容——不是千篇一律的教程，而是来自你自己工作产出的活知识。
+**L4AI 填补这个缺口。** 它把你每天 AI 辅助写出的代码，自动转化为一个个属于你的 5 分钟微学习——不是千篇一律的教程，而是从你自己每天的工作中提炼出的活知识。
 
 ---
 
 ## ✨ 核心功能
 
 ### 🔍 今日代码自动收集
-L4AI 自动扫描当天 Git 增量变更和工作区上下文，智能过滤锁文件、构建产物、纯格式化提交等噪声，只提取真正有学习价值的信号。
+自动扫描当天 Git 增量变更，智能过滤锁文件、构建产物、纯格式化提交等噪声，只提取真正有学习价值的代码信号。
 
 ### 🧩 四维立体学习卡片
 
@@ -76,7 +87,7 @@ L4AI 自动扫描当天 Git 增量变更和工作区上下文，智能过滤锁�
 </p>
 
 - 按分类一键过滤卡片
-- 折叠/展开深度原理剖析
+- 折叠/展开深度原理剖析，按需获取
 - 交互式问答模式，答案按需揭示
 - 直接复制代码切片至剪贴板
 
@@ -84,11 +95,11 @@ L4AI 自动扫描当天 Git 增量变更和工作区上下文，智能过滤锁�
 每日复盘记录自动保存为 `.l4ai/daily/YYYY-MM-DD.md` 标准 Markdown 文件，天然兼容 **Obsidian**、**Logseq**、**Notion** 等任意笔记工具。
 
 ### 🤖 零门槛双通道模型接入
-- **VS Code LM API**（默认）：直接复用你已有的 GitHub Copilot 订阅，无需任何额外配置
+- **VS Code LM API**（默认）：直接复用已有的 GitHub Copilot 订阅，无需任何额外配置
 - **自定义 LLM**：DeepSeek、OpenAI、Claude，或任何本地 Ollama 端点
 
 ### ✂️ 划词即时提炼
-右键选中任意代码片段 → **「L4AI: 提炼当前选中代码深度原理」** — 随时获取任意代码段的即时深度剖析。
+右键选中任意代码片段 → **「L4AI: 提炼当前选中代码深度原理」** — 随时获取任意代码的即时深度剖析。
 
 ---
 
@@ -97,7 +108,7 @@ L4AI 自动扫描当天 Git 增量变更和工作区上下文，智能过滤锁�
 ### 从 VS Marketplace 安装（推荐）
 1. 打开 VS Code
 2. 按 `Ctrl+Shift+X` 打开扩展面板
-3. 搜索 **"Learning from AI"**
+3. 搜索 **"L4AI"**
 4. 点击 **安装**
 
 ### 手动 VSIX 安装
@@ -186,30 +197,19 @@ code --install-extension learning-from-ai-0.1.0.vsix
 ### 本地开发环境搭建
 
 ```bash
-# 克隆仓库
-git clone https://github.com/l4ai/learning-from-ai.git
-cd learning-from-ai
-
-# 安装依赖
+git clone https://github.com/l4ai/learning-for-the-ai-era.git
+cd learning-for-the-ai-era
 npm install
-
-# 开发构建（含 Source Map）
-npm run build
-
-# 生产构建（压缩，无 Source Map）
-npm run package
-
-# 打包为 VSIX
-npm run package:vsix
-
-# 监听模式（开发时使用）
-npm run build -- --watch
+npm run build          # 开发构建（含 Source Map）
+npm run package        # 生产构建（压缩，无 Source Map）
+npm run package:vsix   # 打包为 VSIX
+npm run build -- --watch  # 监听模式
 ```
 
 ### 项目结构
 
 ```
-learning-from-ai/
+l4ai/
 ├── src/
 │   ├── extension.ts              # 插件入口 & 命令注册
 │   ├── types.ts                  # 共享 TypeScript 类型定义
@@ -228,12 +228,11 @@ learning-from-ai/
 │   ├── workflows/
 │   │   ├── ci.yml                # CI：每次 PR 触发构建、类型检查、lint
 │   │   └── release.yml           # Release：版本标签触发自动打包与发布
-│   ├── ISSUE_TEMPLATE/           # Bug 报告 & 功能请求模板
-│   └── PULL_REQUEST_TEMPLATE.md  # PR Checklist
-├── package.json                  # 插件清单 & npm 脚本
-├── tsconfig.json                 # TypeScript 配置
-├── esbuild.js                    # 构建打包配置
-└── CHANGELOG.md                  # 版本历史
+│   └── ISSUE_TEMPLATE/
+├── package.json
+├── tsconfig.json
+├── esbuild.js
+└── CHANGELOG.md
 ```
 
 ### 提交规范
@@ -272,17 +271,17 @@ chore: 升级 esbuild 至 0.24
 
 ## 常见问题
 
+**Q: 名字里的「4」是什么意思？**
+A: `L4AI` = **L**earning **4**[for] the **AI** era。`4` 读作 "for"，与 `i18n`（internationalization）、`a11y`（accessibility）的命名风格相同，是一种技术圈的意图压缩表达。
+
 **Q: 没有 GitHub Copilot 也可以用吗？**
-A: 可以。在设置中将 `l4ai.llmProvider` 切换为 `custom`，配置任意 OpenAI 兼容的 API（如 DeepSeek、Ollama 本地模型）即可正常使用。
+A: 可以。在设置中将 `l4ai.llmProvider` 切换为 `custom`，配置 DeepSeek、Ollama 或任意 OpenAI 兼容 API 即可。
 
 **Q: 代码上下文会被发送给第三方吗？**
-A: 仅在你主动触发提炼命令时，代码片段才会发送至你所配置的 LLM 提供方（Copilot 或你自己的自定义 API）。L4AI 本身不会收集或上传任何数据。
+A: 仅在你主动触发提炼命令时，代码片段才会发送至你所配置的 LLM 提供方。L4AI 本身不收集或上传任何数据。
 
 **Q: 生成的 Markdown 文件放在哪里？**
-A: 默认保存在工作区根目录的 `.l4ai/daily/YYYY-MM-DD.md`，可通过 `l4ai.notesDir` 配置项自定义路径。
-
-**Q: 为什么叫 L4AI？**
-A: `L4AI` = **L**earning **for** the **AI** era（为 AI 时代而学习）。字母 `4` 在技术圈读作 `for`，与 `w3c`、`i18n`、`a11y` 的命名风格一致。
+A: 默认保存在工作区根目录的 `.l4ai/daily/YYYY-MM-DD.md`，可通过 `l4ai.notesDir` 自定义路径。
 
 ---
 
@@ -293,5 +292,5 @@ MIT © [L4AI Community](https://github.com/l4ai)
 ---
 
 <p align="center">
-  用 ❤️ 为所有在 AI 时代依然想持续成长的开发者打造
+  为那些用 AI 快速交付、同时依然渴望持续成长的开发者而构建
 </p>

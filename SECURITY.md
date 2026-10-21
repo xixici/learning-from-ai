@@ -8,7 +8,7 @@
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability in L4AI, please **do not** open a public GitHub issue.
+If you discover a security vulnerability in **L4AI — Learning for the AI Era**, please **do not** open a public GitHub issue.
 
 Instead, please report it via:
 

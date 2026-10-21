@@ -1,11 +1,15 @@
 <p align="center">
-  <img src="resources/banner.png" alt="Learning from AI (L4AI) Banner" width="640"/>
+  <img src="resources/banner.png" alt="L4AI — Learning for the AI Era" width="640"/>
 </p>
 
-<h1 align="center">🧠 Learning from AI — L4AI</h1>
+<h1 align="center">🧠 L4AI</h1>
 
 <p align="center">
-  <strong>Stop letting AI write your knowledge gap. Start learning from every line it writes.</strong>
+  <b>Learning for the AI Era</b>
+</p>
+
+<p align="center">
+  Ship faster with AI. But actually learn while you do.
 </p>
 
 <p align="center">
@@ -15,18 +19,23 @@
   <a href="https://marketplace.visualstudio.com/items?itemName=l4ai-community.learning-from-ai">
     <img src="https://img.shields.io/visual-studio-marketplace/d/l4ai-community.learning-from-ai?style=flat-square&color=007ACC&label=Installs" alt="VS Marketplace Downloads"/>
   </a>
-  <a href="https://github.com/l4ai/learning-from-ai/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/l4ai/learning-from-ai?style=flat-square&color=brightgreen" alt="License: MIT"/>
+  <a href="https://github.com/l4ai/learning-for-the-ai-era/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/l4ai/learning-for-the-ai-era?style=flat-square&color=brightgreen" alt="License: MIT"/>
   </a>
-  <a href="https://github.com/l4ai/learning-from-ai/actions/workflows/ci.yml">
-    <img src="https://img.shields.io/github/actions/workflow/status/l4ai/learning-from-ai/ci.yml?branch=main&style=flat-square&label=CI&logo=github-actions" alt="CI Status"/>
+  <a href="https://github.com/l4ai/learning-for-the-ai-era/actions/workflows/ci.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/l4ai/learning-for-the-ai-era/ci.yml?branch=main&style=flat-square&label=CI&logo=github-actions" alt="CI Status"/>
   </a>
-  <a href="https://github.com/l4ai/learning-from-ai/releases">
-    <img src="https://img.shields.io/github/v/release/l4ai/learning-from-ai?style=flat-square&color=blueviolet&logo=github" alt="GitHub Release"/>
+  <a href="https://github.com/l4ai/learning-for-the-ai-era/releases">
+    <img src="https://img.shields.io/github/v/release/l4ai/learning-for-the-ai-era?style=flat-square&color=blueviolet&logo=github" alt="GitHub Release"/>
   </a>
 </p>
 
 <p align="center">
+  <a href="README.zh-CN.md">🇨🇳 中文文档</a> | <strong>🇺🇸 English</strong>
+</p>
+
+<p align="center">
+  <a href="#-the-problem">The Problem</a> •
   <a href="#-features">Features</a> •
   <a href="#-quick-start">Quick Start</a> •
   <a href="#-how-it-works">How It Works</a> •
@@ -35,39 +44,41 @@
   <a href="./CHANGELOG.md">Changelog</a>
 </p>
 
-<p align="center">
-  <a href="README.zh-CN.md">🇨🇳 中文文档</a> | <strong>🇺🇸 English</strong>
-</p>
+---
+
+> **L4AI** = **L**earning **4**[for] the **AI** era
+>
+> *The "4" isn't a typo — it's a statement. Like `i18n`, `a11y`, and `w3c`, it's a compression of intent: we're building for a generation of developers who code alongside AI, and still need to grow.*
 
 ---
 
 ## The Problem
 
-The rise of AI coding tools (GitHub Copilot, Cursor, Claude Code) has created a paradox:
+AI coding tools (GitHub Copilot, Cursor, Claude Code) have created a silent paradox:
 
-> **You ship faster, but learn slower.**
+> **You ship faster. But you learn slower.**
 
-Every day, AI writes thousands of lines you accept without truly understanding — complex async patterns, architecture decisions, subtle gotchas. Three days later, you can't reproduce or debug them. The **skill erosion is silent and cumulative.**
+Every day, AI writes thousands of lines you accept without truly understanding — complex async patterns, architecture decisions, subtle edge guards. Three days later, you can't reproduce or debug them independently.
 
-## The Solution
+This isn't laziness. **It's a structural gap in the AI-era workflow.** There's no natural moment where understanding is required before code gets merged.
 
-**L4AI** is a VS Code extension that automatically turns your daily AI-assisted code into personalized learning cards. It hooks into your Git diff and workspace context, then uses LLM reasoning to extract exactly what *you* should learn from *today's* code — not generic tutorials, but knowledge from *your own work*.
+**L4AI closes that gap.** It automatically turns your daily AI-assisted code into a personalized 5-minute learning session — not generic tutorials, but knowledge extracted from *your own work*.
 
 ---
 
 ## ✨ Features
 
 ### 🔍 Automatic Daily Code Digest
-L4AI scans your today's Git incremental changes and workspace context, filters out noise (lockfiles, build artifacts, formatting), and surfaces the real learning signal.
+Scans today's Git incremental changes, filters noise (lockfiles, build artifacts, formatting-only diffs), and surfaces the real learning signal.
 
 ### 🧩 4-Dimensional Learning Cards
 
-| Card Type | What it extracts |
+| Card Type | What it captures |
 |-----------|-----------------|
 | 💡 **Syntax & Idioms** | Language features, advanced APIs, and patterns you used but might not fully grasp |
-| 🏗️ **Architecture & Trade-offs** | Why the code is structured this way — design decisions and their consequences |
-| ⚠️ **Gotchas & Edge Cases** | Hidden guard clauses, race conditions, and edge handling in AI-generated code |
-| ❓ **Active Recall Quiz** | Anki-style Q&A cards with hints and detailed explanations for self-testing |
+| 🏗️ **Architecture & Trade-offs** | Why the code is structured this way — decisions and their consequences |
+| ⚠️ **Gotchas & Edge Cases** | Hidden guard clauses, race conditions, and silent risks in AI-generated code |
+| ❓ **Active Recall Quiz** | Anki-style Q&A with hints and detailed explanations — so you verify you actually know it |
 
 ### 🖥️ Native VS Code Sidebar Panel
 
@@ -76,19 +87,19 @@ L4AI scans your today's Git incremental changes and workspace context, filters o
 </p>
 
 - Filter cards by category with one click
-- Expand/collapse deep-dive explanations
+- Expand/collapse deep-dive explanations on demand
 - Interactive quiz mode with reveal-on-demand answers
 - Copy code snippets directly to clipboard
 
 ### 📝 Markdown Knowledge Base
-Every daily digest is automatically saved to `.l4ai/daily/YYYY-MM-DD.md` — plain Markdown files that work natively with **Obsidian**, **Logseq**, **Notion**, and any note-taking tool.
+Every daily digest auto-saves to `.l4ai/daily/YYYY-MM-DD.md` — plain Markdown, compatible with **Obsidian**, **Logseq**, **Notion**, and any note-taking tool.
 
 ### 🤖 Zero-Config LLM Support
 - **VS Code LM API** (default): Uses your existing GitHub Copilot subscription — no API key needed
 - **Custom LLM**: DeepSeek, OpenAI, Claude, or any local Ollama endpoint
 
 ### ✂️ Selection-Based Instant Learning
-Right-click any code selection → **"L4AI: Extract Learning from Selection"** — get instant deep-dive analysis of any snippet.
+Right-click any code selection → **"L4AI: Extract Learning from Selection"** — on-demand deep analysis of any snippet.
 
 ---
 
@@ -96,8 +107,8 @@ Right-click any code selection → **"L4AI: Extract Learning from Selection"** �
 
 ### Install from VS Marketplace *(Recommended)*
 1. Open VS Code
-2. Press `Ctrl+Shift+X` to open Extensions
-3. Search for **"Learning from AI"**
+2. Press `Ctrl+Shift+X`
+3. Search for **"L4AI"**
 4. Click **Install**
 
 ### Install from VSIX (Manual)
@@ -108,7 +119,7 @@ code --install-extension learning-from-ai-0.1.0.vsix
 ### First Use
 1. Open any project with code changes
 2. Press `Ctrl+Shift+P` → **`L4AI: Extract Today's Learnings`**
-3. Check your sidebar (brain icon in Activity Bar) for today's cards
+3. Check the sidebar (brain icon in Activity Bar) for today's cards
 4. Find your Markdown notes in `.l4ai/daily/`
 
 ---
@@ -153,7 +164,7 @@ Open VS Code Settings (`Ctrl+,`) and search for `l4ai`:
 | `l4ai.customApiBaseUrl` | `https://api.deepseek.com/v1` | Base URL for custom OpenAI-compatible API |
 | `l4ai.customApiKey` | `""` | API key for custom provider |
 | `l4ai.customModel` | `deepseek-chat` | Model name for custom provider |
-| `l4ai.notesDir` | `.l4ai/daily` | Directory for Markdown notes (relative to workspace) |
+| `l4ai.notesDir` | `.l4ai/daily` | Directory for Markdown notes (relative to workspace root) |
 
 ### Example: Using DeepSeek
 
@@ -186,32 +197,21 @@ Contributions are very welcome! Please read our [Contributing Guide](CONTRIBUTIN
 ### Development Setup
 
 ```bash
-# Clone the repo
-git clone https://github.com/l4ai/learning-from-ai.git
-cd learning-from-ai
-
-# Install dependencies
+git clone https://github.com/l4ai/learning-for-the-ai-era.git
+cd learning-for-the-ai-era
 npm install
-
-# Build (development mode with source maps)
-npm run build
-
-# Build for production
-npm run package
-
-# Package as VSIX
-npm run package:vsix
-
-# Watch mode for development
-npm run build -- --watch
+npm run build          # dev build with source maps
+npm run package        # production build
+npm run package:vsix   # package as installable VSIX
+npm run build -- --watch  # watch mode
 ```
 
 ### Project Structure
 
 ```
-learning-from-ai/
+l4ai/
 ├── src/
-│   ├── extension.ts              # Extension entry point & command registration
+│   ├── extension.ts              # Entry point & command registration
 │   ├── types.ts                  # Shared TypeScript types
 │   ├── collector/
 │   │   ├── gitCollector.ts       # Git diff & workspace code collector
@@ -228,12 +228,11 @@ learning-from-ai/
 │   ├── workflows/
 │   │   ├── ci.yml                # CI: build, typecheck, lint on every PR
 │   │   └── release.yml           # Release: auto-package & publish on version tag
-│   ├── ISSUE_TEMPLATE/           # Bug report & feature request templates
-│   └── PULL_REQUEST_TEMPLATE.md  # PR checklist
-├── package.json                  # Extension manifest & npm scripts
-├── tsconfig.json                 # TypeScript config
-├── esbuild.js                    # Build bundler config
-└── CHANGELOG.md                  # Version history
+│   └── ISSUE_TEMPLATE/
+├── package.json
+├── tsconfig.json
+├── esbuild.js
+└── CHANGELOG.md
 ```
 
 ### Commit Convention
@@ -262,11 +261,11 @@ chore: bump esbuild to 0.24
 
 ## 🗺️ Roadmap
 
-- [x] **v0.1** — Core extraction, sidebar UI, Markdown export
-- [ ] **v0.2** — Spaced repetition scheduler (SM-2), daily quiz reminders
+- [x] **v0.1** — Core extraction engine, sidebar UI, Markdown export
+- [ ] **v0.2** — Spaced repetition (SM-2) scheduler, daily review reminders
 - [ ] **v0.3** — Anki `.apkg` export, Obsidian plugin sync
 - [ ] **v0.4** — Knowledge growth heatmap calendar
-- [ ] **v0.5** — Team mode: share learning cards across workspace
+- [ ] **v0.5** — Team mode: share learning cards across a shared workspace
 
 ---
 
@@ -277,5 +276,5 @@ MIT © [L4AI Community](https://github.com/l4ai)
 ---
 
 <p align="center">
-  Made with ❤️ for developers who want to grow faster in the AI era
+  Built for developers who ship with AI — and still want to grow.
 </p>

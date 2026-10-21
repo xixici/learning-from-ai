@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to **Learning from AI (L4AI)** will be documented in this file.
+All notable changes to **L4AI — Learning for the AI Era** will be documented in this file.
 
 This project adheres to [Semantic Versioning](https://semver.org/) and [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
