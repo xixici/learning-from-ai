@@ -183,6 +183,20 @@ Open VS Code Settings (`Ctrl+,`) and search for `lfai`:
 
 ---
 
+## 📈 Star History
+
+<p align="center">
+  <a href="https://star-history.com/#xixici/learning-from-ai&Date">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=xixici/learning-from-ai&type=Date&theme=dark" />
+      <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=xixici/learning-from-ai&type=Date" />
+      <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=xixici/learning-from-ai&type=Date" width="100%" />
+    </picture>
+  </a>
+</p>
+
+---
+
 ## 📄 License
 
 MIT © [LFAI Community](https://github.com/xixici/learning-from-ai)

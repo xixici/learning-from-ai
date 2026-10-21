@@ -136,6 +136,30 @@ code --install-extension lfai-0.1.0.vsix
 
 ---
 
+## 🗺️ 开发路线图
+
+- [x] **v0.1** — 核心提炼引擎、侧边栏交互看板、Markdown 自动归档
+- [ ] **v0.2** — 间隔重复调度器（SM-2 算法）、每日复习提醒
+- [ ] **v0.3** — Anki `.apkg` 导出、Obsidian 插件双向同步
+- [ ] **v0.4** — 知识成长热力图日历
+- [ ] **v0.5** — 团队模式：在工作区内共享学习卡片
+
+---
+
+## 📈 Star 增长趋势 (Star History)
+
+<p align="center">
+  <a href="https://star-history.com/#xixici/learning-from-ai&Date">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=xixici/learning-from-ai&type=Date&theme=dark" />
+      <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=xixici/learning-from-ai&type=Date" />
+      <img alt="Star 历史图表" src="https://api.star-history.com/svg?repos=xixici/learning-from-ai&type=Date" width="100%" />
+    </picture>
+  </a>
+</p>
+
+---
+
 ## 📄 许可证
 
 MIT © [LFAI Community](https://github.com/xixici/learning-from-ai)
