@@ -118,9 +118,7 @@ jobs:
         run: |
           VERSION="${{ needs.validate.outputs.tag }}"
           # Extract section between this version header and the next
-          NOTES=$(awk "/^## \[${VERSION#v}\]/,/^## \[/" CHANGELOG.md \
-                  | head -n -1 \
-                  | tail -n +2)
+          NOTES=$(awk -v ver="${VERSION#v}" 'index($0, "## [" ver "]") == 1 { found=1; next } found && /^## \[/ { found=0 } found { print }' CHANGELOG.md)
           if [ -z "$NOTES" ]; then
             NOTES="See [CHANGELOG.md](https://github.com/xixici/learning-from-ai/blob/main/CHANGELOG.md) for details."
           fi

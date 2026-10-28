@@ -14,7 +14,7 @@
 
 <p align="center">
   <a href="https://marketplace.visualstudio.com/items?itemName=xixici.lfai">
-    <img src="https://img.shields.io/badge/VS_Marketplace-v0.1.3-007ACC?style=flat-square&logo=visual-studio-code" alt="VS Marketplace Version"/>
+    <img src="https://img.shields.io/badge/VS_Marketplace-v0.1.4-007ACC?style=flat-square&logo=visual-studio-code" alt="VS Marketplace Version"/>
   </a>
   <a href="https://github.com/xixici/learning-from-ai/releases">
     <img src="https://img.shields.io/github/v/release/xixici/learning-from-ai?style=flat-square&color=blueviolet&logo=github" alt="GitHub Release"/>
@@ -112,7 +112,7 @@ Right-click any code selection â†’ **"LFAI: Extract Learning from Selection"** â
 
 ### Install from VSIX (Manual)
 ```bash
-code --install-extension lfai-0.1.3.vsix
+code --install-extension lfai-0.1.4.vsix
 ```
 
 ### First Use

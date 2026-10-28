@@ -14,7 +14,7 @@
 
 <p align="center">
   <a href="https://marketplace.visualstudio.com/items?itemName=xixici.lfai">
-    <img src="https://img.shields.io/badge/VS_Marketplace-v0.1.3-007ACC?style=flat-square&logo=visual-studio-code" alt="VS Marketplace 版本"/>
+    <img src="https://img.shields.io/badge/VS_Marketplace-v0.1.4-007ACC?style=flat-square&logo=visual-studio-code" alt="VS Marketplace 版本"/>
   </a>
   <a href="https://github.com/xixici/learning-from-ai/releases">
     <img src="https://img.shields.io/github/v/release/xixici/learning-from-ai?style=flat-square&color=blueviolet&logo=github" alt="最新发布"/>
@@ -105,7 +105,7 @@ AI 编程工具（GitHub Copilot、Cursor、Claude Code 等）的普及带来了
 
 ### 手动 VSIX 安装
 ```bash
-code --install-extension lfai-0.1.3.vsix
+code --install-extension lfai-0.1.4.vsix
 ```
 
 ### 第一次使用

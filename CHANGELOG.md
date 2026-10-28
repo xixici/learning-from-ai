@@ -15,6 +15,31 @@ This project adheres to [Semantic Versioning](https://semver.org/) and [Keep a C
 - Team/workspace-shared learning card mode
 
 ---
+## [0.1.4] — 2026-10-28
+
+### Security
+- Escape JSON embedded in webview script tag to eliminate potential XSS risk.
+- Fix `CancellationTokenSource` leak in `callVsCodeLM`.
+- Switch synchronous `fs` methods to non-blocking `fs/promises` in `noteManager`.
+
+### Reliability
+- Robust LLM JSON response extraction using regex matching instead of prefix checking.
+- Add error boundary with user notification to `extractSelection` command.
+- Add 60-second fetch timeout for custom OpenAI-compatible API requests.
+- Add `isExtracting` state mutex guard to prevent overlapping concurrent extraction operations.
+- Add detailed error logging for Git command failures.
+
+### Performance
+- Retrieve Git diff and commit log concurrently with `Promise.all`.
+- Optimize diff filtering to eliminate redundant array/set conversions.
+- Remove redundant directory existence check before recursive `mkdir`.
+
+### Engineering
+- Streamline extension package bundle by excluding documentation assets in `.vscodeignore`.
+- Configure empty `activationEvents` array for modern VS Code lazy activation.
+
+---
+
 
 ## [0.1.3] — 2026-10-21
 
@@ -87,7 +112,8 @@ This project adheres to [Semantic Versioning](https://semver.org/) and [Keep a C
 
 ---
 
-[Unreleased]: https://github.com/xixici/learning-from-ai/compare/v0.1.3...HEAD
+[Unreleased]: https://github.com/xixici/learning-from-ai/compare/v0.1.4...HEAD
+[0.1.4]: https://github.com/xixici/learning-from-ai/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/xixici/learning-from-ai/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/xixici/learning-from-ai/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/xixici/learning-from-ai/compare/v0.1.0...v0.1.1
