@@ -2,7 +2,7 @@
   "name": "lfai",
   "displayName": "LFAI — Learning From AI",
   "description": "从每日代码变更与 AI 交互中提炼核心考点、架构权衡与自测卡片，告别 AI 时代技能空心化。",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "publisher": "xixici",
   "icon": "resources/icon.png",
   "repository": {
@@ -77,6 +77,24 @@
         "title": "刷新今日学习看板",
         "category": "LFAI",
         "icon": "$(refresh)"
+      },
+      {
+        "command": "lfai.captureClipboardNow",
+        "title": "立即捕获当前剪贴板入暂存箱",
+        "category": "LFAI",
+        "icon": "$(inbox)"
+      },
+      {
+        "command": "lfai.extractInbox",
+        "title": "批量提炼暂存箱中的技术对话",
+        "category": "LFAI",
+        "icon": "$(sparkle)"
+      },
+      {
+        "command": "lfai.clearInbox",
+        "title": "清空知识暂存箱",
+        "category": "LFAI",
+        "icon": "$(trash)"
       }
     ],
     "menus": {
@@ -140,6 +158,21 @@
           "type": "string",
           "default": ".lfai/daily",
           "description": "学习笔记保存目录（相对于工作区根目录）"
+        },
+        "lfai.enableClipboardWatcher": {
+          "type": "boolean",
+          "default": true,
+          "description": "是否开启后台剪贴板监听，自动将 ChatGPT/Gemini 高价值技术对话暂存入 Inbox"
+        },
+        "lfai.clipboardCheckInterval": {
+          "type": "number",
+          "default": 2000,
+          "description": "剪贴板自动监听检测间隔（毫秒，默认 2000ms）"
+        },
+        "lfai.notifyOnClipboardCapture": {
+          "type": "boolean",
+          "default": true,
+          "description": "成功捕获剪贴板高价值对话时是否显示轻量右下角提示"
         }
       }
     }

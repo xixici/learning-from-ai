@@ -70,3 +70,18 @@ ${codeContext}
 2. 过滤掉所有常规平庸代码，提炼出 3-5 张最具认知深度、包含破坏性推演与原理剖析的【技术内参学习卡片（cards）】；
 3. 输出纯 JSON。`;
 }
+
+export function buildInboxPrompt(inboxTexts: string[]): string {
+  const joinedContext = inboxTexts
+    .map((text, idx) => `=== [记录 ${idx + 1}] ===\n${text}`)
+    .join('\n\n----------------------------------------\n\n');
+
+  return `以下是开发者在与外部 AI（如 ChatGPT、Gemini、Claude）交互过程中沉淀的高价值对话与技术讨论记录（来自 LFAI 暂存箱）：
+
+${joinedContext}
+
+请严格依照系统指令：
+1. 自动剥离寒暄客套与冗余排版，提炼出 3-5 条可直接用于今日站会/日报/PR 描述的【工作交付成果（workSummary）】；
+2. 识别出对话中最具含金量的技术方案选型、底层原理、避坑指南，提炼出 3-5 张最具认知深度、包含破坏性推演与原理剖析的【技术内参学习卡片（cards）】；
+3. 输出纯 JSON。`;
+}

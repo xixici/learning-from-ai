@@ -15,6 +15,24 @@ This project adheres to [Semantic Versioning](https://semver.org/) and [Keep a C
 - Team/workspace-shared learning card mode
 
 ---
+## [0.1.5] — 2026-10-28
+
+### Added
+- **Ditto-Style Background Clipboard Watcher (剪贴板智能常驻监听与暂存)**:
+  - Background daemon automatically listens for OS clipboard updates without blocking or manual pasting.
+  - Captures high-value technical discussions and Q&A from ChatGPT, Gemini, and Claude directly into local inbox (`.lfai/inbox/items.json`).
+  - Window focus sensing: automatically sniffs clipboard immediately upon returning to VS Code.
+- **AI Dialog & Heuristic Content Filter (智能特征过滤与敏感数据防护)**:
+  - Automatically filters out passwords, private keys, API tokens (`ghp_`, `sk-`, `AKIA`, SSH keys), and short noise.
+  - Detects code blocks, AI role markers (`ChatGPT:`, `User:`, `Assistant:`), and deep-dive technical keywords in Chinese and English.
+- **Inbox Knowledge Buffer & Batch Extraction (知识暂存箱与批量提炼)**:
+  - Dedicated **📥 AI 知识暂存箱** component in the VS Code sidebar with live count, preview list, and one-click deletion.
+  - One-click batch extraction command `LFAI: 批量提炼暂存箱中的技术对话` (`lfai.extractInbox`), digesting multiple external AI chats into Staff-level learning cards.
+  - Status bar indicator dynamically displays pending inbox items count alongside daily cards.
+  - New manual capture command `LFAI: 立即捕获当前剪贴板入暂存箱` (`lfai.captureClipboardNow`).
+
+---
+
 ## [0.1.4] — 2026-10-28
 
 ### Security
@@ -112,7 +130,8 @@ This project adheres to [Semantic Versioning](https://semver.org/) and [Keep a C
 
 ---
 
-[Unreleased]: https://github.com/xixici/learning-from-ai/compare/v0.1.4...HEAD
+[Unreleased]: https://github.com/xixici/learning-from-ai/compare/v0.1.5...HEAD
+[0.1.5]: https://github.com/xixici/learning-from-ai/compare/v0.1.4...v0.1.5
 [0.1.4]: https://github.com/xixici/learning-from-ai/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/xixici/learning-from-ai/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/xixici/learning-from-ai/compare/v0.1.1...v0.1.2

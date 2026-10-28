@@ -37,8 +37,19 @@ export interface DailyDigest {
   rawSourceCount?: number;
 }
 
+export type ExtractionSourceType = 'git_diff' | 'selection' | 'manual' | 'inbox' | 'clipboard';
+
 export interface ExtractionRequest {
-  sourceType: 'git_diff' | 'selection' | 'manual';
+  sourceType: ExtractionSourceType;
   codeContext: string;
   fileHints?: string[];
+}
+
+export interface InboxItem {
+  id: string;
+  timestamp: number;
+  preview: string;
+  content: string;
+  source: 'clipboard' | 'manual';
+  detectedType: 'chat' | 'code' | 'snippet';
 }

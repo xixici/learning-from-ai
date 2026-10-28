@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { DailyDigest, LearningCard } from '../types';
-import { EXTRACTION_SYSTEM_PROMPT, buildUserPrompt } from './prompt';
+import { EXTRACTION_SYSTEM_PROMPT, buildUserPrompt, buildInboxPrompt } from './prompt';
 
 export class LLMClient {
   public static async extractLearnings(
@@ -32,6 +32,35 @@ export class LLMClient {
     }
 
     return this.parseDigestResponse(rawResponse, fileHints);
+  }
+
+  public static async extractInboxLearnings(
+    inboxTexts: string[],
+    token?: vscode.CancellationToken
+  ): Promise<DailyDigest> {
+    const config = vscode.workspace.getConfiguration('lfai');
+    const provider = config.get<string>('llmProvider', 'vscode.lm');
+    const promptText = buildInboxPrompt(inboxTexts);
+
+    let rawResponse = '';
+
+    if (provider === 'vscode.lm') {
+      try {
+        rawResponse = await this.callVsCodeLM(promptText, token);
+      } catch (err: unknown) {
+        const errorMsg = err instanceof Error ? err.message : String(err);
+        vscode.window.showWarningMessage(`LFAI: 尝试调用 VS Code LM 失败 (${errorMsg})，正在检查自定义 API 配置...`);
+        rawResponse = await this.callCustomAPI(promptText);
+      }
+    } else {
+      rawResponse = await this.callCustomAPI(promptText);
+    }
+
+    if (!rawResponse.trim()) {
+      return this.generateFallbackDigest(['Inbox/ChatGPT/Gemini 对话']);
+    }
+
+    return this.parseDigestResponse(rawResponse, ['Inbox/ChatGPT/Gemini 对话']);
   }
 
   private static async callVsCodeLM(

@@ -1,12 +1,19 @@
 import * as vscode from 'vscode';
-import { DailyDigest } from '../types';
+import { DailyDigest, InboxItem } from '../types';
 import { NoteManager } from '../storage/noteManager';
+import { InboxManager } from '../storage/inboxManager';
 
 export class LFAISidebarProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'lfai.sidebarView';
   private _view?: vscode.WebviewView;
 
-  constructor(private readonly _context: vscode.ExtensionContext) {}
+  constructor(private readonly _context: vscode.ExtensionContext) {
+    _context.subscriptions.push(
+      InboxManager.onDidUpdateInbox(() => {
+        this.renderWebview();
+      })
+    );
+  }
 
   public resolveWebviewView(
     webviewView: vscode.WebviewView,
@@ -40,6 +47,21 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
         case 'notify':
           vscode.window.showInformationMessage(data.text);
           break;
+        case 'extractInbox':
+          await vscode.commands.executeCommand('lfai.extractInbox');
+          break;
+        case 'clearInbox':
+          await InboxManager.clearInbox(this._context);
+          vscode.window.showInformationMessage('LFAI: 暂存箱已清空。');
+          break;
+        case 'removeInboxItem':
+          if (data.id) {
+            await InboxManager.removeItem(this._context, data.id);
+          }
+          break;
+        case 'captureClipboard':
+          await vscode.commands.executeCommand('lfai.captureClipboardNow');
+          break;
       }
     });
   }
@@ -54,17 +76,19 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
     this.renderWebview();
   }
 
-  private renderWebview(): void {
+  private async renderWebview(): Promise<void> {
     if (!this._view) {
       return;
     }
 
     const digest = NoteManager.getCachedDigest(this._context);
-    this._view.webview.html = this.getHtmlForWebview(digest);
+    const inboxItems = await InboxManager.getItems(this._context);
+    this._view.webview.html = this.getHtmlForWebview(digest, inboxItems);
   }
 
-  private getHtmlForWebview(digest?: DailyDigest): string {
+  private getHtmlForWebview(digest?: DailyDigest, inboxItems: InboxItem[] = []): string {
     const todayStr = new Date().toISOString().split('T')[0];
+    const inboxItemsJson = JSON.stringify(inboxItems).replace(/</g, '\\u003c');
 
     const cardsJson = JSON.stringify(digest?.cards || []).replace(/</g, '\\u003c');
     const workSummaryJson = JSON.stringify(digest?.workSummary || null).replace(/</g, '\\u003c');
@@ -371,6 +395,83 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
       font-size: 36px;
       margin-bottom: 10px;
     }
+    .inbox-box {
+      margin-top: 10px;
+      background: var(--card-bg);
+      border: 1px solid var(--accent);
+      border-radius: 6px;
+      padding: 10px;
+    }
+    .inbox-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .inbox-title {
+      font-weight: 600;
+      color: var(--badge-syntax);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+    }
+    .inbox-item {
+      background: var(--code-bg);
+      border-radius: 4px;
+      padding: 6px 8px;
+      margin-bottom: 6px;
+      font-size: 11px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-left: 3px solid var(--accent);
+    }
+    .inbox-item-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex: 1;
+      margin-right: 6px;
+      color: var(--fg);
+    }
+    .inbox-item-del {
+      cursor: pointer;
+      opacity: 0.6;
+      font-size: 12px;
+      padding: 2px 4px;
+      user-select: none;
+    }
+    .inbox-item-del:hover {
+      opacity: 1;
+      color: #f48771;
+    }
+    .inbox-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .inbox-btn-extract {
+      flex: 2;
+      background: var(--accent);
+      color: var(--accent-fg);
+      border: none;
+      border-radius: 4px;
+      padding: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .inbox-btn-clear {
+      flex: 1;
+      background: transparent;
+      border: 1px solid var(--card-border);
+      color: var(--fg);
+      border-radius: 4px;
+      padding: 6px;
+      font-size: 11px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -384,7 +485,22 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
       <button id="btnExtract">⚡ 提炼今日考点</button>
       <button class="secondary" id="btnStandup">📋 复制日报/PR</button>
     </div>
-    <button class="secondary" style="width: 100%;" id="btnNote">📝 打开 Markdown 复盘笔记</button>
+    <div style="display: flex; gap: 6px; margin-top: 6px;">
+      <button class="secondary" style="flex: 1;" id="btnCapture">📥 捕获剪贴板</button>
+      <button class="secondary" style="flex: 2;" id="btnNote">📝 打开 Markdown 复盘笔记</button>
+    </div>
+  </div>
+
+  <div id="inboxBox" class="inbox-box" style="display: none;">
+    <div class="inbox-header">
+      <span class="inbox-title" id="inboxTitle">📥 AI 对话暂存箱</span>
+      <span style="font-size: 11px; opacity: 0.7;" id="inboxCountBadge">0 条</span>
+    </div>
+    <div id="inboxList"></div>
+    <div class="inbox-actions">
+      <button class="inbox-btn-extract" id="btnExtractInbox">🧠 批量提炼暂存对话</button>
+      <button class="inbox-btn-clear" id="btnClearInbox">清空</button>
+    </div>
   </div>
 
   <div id="workSummaryBox" class="work-summary-box" style="display: none;">
@@ -412,6 +528,7 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
     const vscode = acquireVsCodeApi();
     let cardsData = ${cardsJson};
     let workSummaryData = ${workSummaryJson};
+    let inboxData = ${inboxItemsJson};
     let currentFilter = 'all';
 
     document.getElementById('btnExtract').addEventListener('click', () => {
@@ -424,6 +541,18 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
 
     document.getElementById('btnNote').addEventListener('click', () => {
       vscode.postMessage({ type: 'openNote' });
+    });
+
+    document.getElementById('btnCapture').addEventListener('click', () => {
+      vscode.postMessage({ type: 'captureClipboard' });
+    });
+
+    document.getElementById('btnExtractInbox').addEventListener('click', () => {
+      vscode.postMessage({ type: 'extractInbox' });
+    });
+
+    document.getElementById('btnClearInbox').addEventListener('click', () => {
+      vscode.postMessage({ type: 'clearInbox' });
     });
 
     document.getElementById('workSummaryHeader').addEventListener('click', () => {
@@ -451,6 +580,10 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
         document.getElementById('summaryBox').innerText = msg.digest.summary || '提炼完成';
         renderWorkSummary();
         renderCards();
+      }
+      if (msg.type === 'updateInbox' && msg.items) {
+        inboxData = msg.items;
+        renderInbox();
       }
     });
 
@@ -594,6 +727,36 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
         .replace(/'/g, '&#039;');
     }
 
+
+    function renderInbox() {
+      const box = document.getElementById('inboxBox');
+      const listEl = document.getElementById('inboxList');
+      const badgeEl = document.getElementById('inboxCountBadge');
+
+      if (!inboxData || inboxData.length === 0) {
+        box.style.display = 'none';
+        return;
+      }
+
+      box.style.display = 'block';
+      badgeEl.innerText = inboxData.length + ' 条待提炼';
+      listEl.innerHTML = '';
+
+      inboxData.forEach((item) => {
+        const itemEl = document.createElement('div');
+        itemEl.className = 'inbox-item';
+        itemEl.innerHTML = \`
+          <span class="inbox-item-text" title="\${escapeHtml(item.preview)}">💬 \${escapeHtml(item.preview)}</span>
+          <span class="inbox-item-del" title="删除本条">✕</span>
+        \`;
+        itemEl.querySelector('.inbox-item-del').addEventListener('click', () => {
+          vscode.postMessage({ type: 'removeInboxItem', id: item.id });
+        });
+        listEl.appendChild(itemEl);
+      });
+    }
+
+    renderInbox();
     renderWorkSummary();
     renderCards();
   </script>

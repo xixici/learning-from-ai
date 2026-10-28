@@ -4,8 +4,9 @@ import { collectActiveSelection } from './collector/selectionCollector';
 import { LLMClient } from './engine/llmClient';
 import { NoteManager } from './storage/noteManager';
 import { LFAISidebarProvider } from './ui/sidebarProvider';
+import { ClipboardWatcher } from './collector/clipboardWatcher';
+import { InboxManager } from './storage/inboxManager';
 import type { DailyDigest } from './types';
-
 let isExtracting = false;
 
 export function activate(context: vscode.ExtensionContext) {
@@ -29,12 +30,25 @@ export function activate(context: vscode.ExtensionContext) {
   statusBarItem.show();
   context.subscriptions.push(statusBarItem);
 
-  // Update status bar with cached digest if exists
-  const cached = NoteManager.getCachedDigest(context);
-  if (cached) {
-    statusBarItem.text = `$(brain) LFAI: ${cached.totalCards}张卡片`;
-  }
+  const updateStatusBar = async () => {
+    const cached = NoteManager.getCachedDigest(context);
+    const inboxItems = await InboxManager.getItems(context);
+    const cardPart = cached ? `${cached.totalCards}张卡片` : '今日知识';
+    const inboxPart = inboxItems.length > 0 ? ` (📥 ${inboxItems.length}条暂存)` : '';
+    statusBarItem.text = `$(brain) LFAI: ${cardPart}${inboxPart}`;
+  };
+  updateStatusBar();
 
+  // Start background clipboard watcher (Ditto-style)
+  const clipboardWatcher = ClipboardWatcher.getInstance(context);
+  context.subscriptions.push(clipboardWatcher);
+
+  // Listen to inbox updates to keep status bar synchronized
+  context.subscriptions.push(
+    InboxManager.onDidUpdateInbox(() => {
+      updateStatusBar();
+    })
+  );
   // 3. Command: Extract Today's Learnings
   const extractTodayCommand = vscode.commands.registerCommand(
     'lfai.extractTodayLearnings',
@@ -202,6 +216,89 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
   context.subscriptions.push(refreshSidebarCommand);
+
+  // 8. Command: Capture Current Clipboard to Inbox
+  const captureClipboardCommand = vscode.commands.registerCommand(
+    'lfai.captureClipboardNow',
+    async () => {
+      const watcher = ClipboardWatcher.getInstance(context);
+      const item = await watcher.checkClipboardNow();
+      if (item) {
+        vscode.window.showInformationMessage('LFAI: 已成功捕获当前剪贴板并存入暂存箱！');
+      } else {
+        vscode.window.showInformationMessage('LFAI: 剪贴板未检测到新的 AI 对话或技术内容。');
+      }
+    }
+  );
+  context.subscriptions.push(captureClipboardCommand);
+
+  // 9. Command: Extract Inbox Items
+  const extractInboxCommand = vscode.commands.registerCommand(
+    'lfai.extractInbox',
+    async () => {
+      if (isExtracting) {
+        vscode.window.showInformationMessage('LFAI: 正在提炼中，请稍候...');
+        return;
+      }
+      const items = await InboxManager.getItems(context);
+      if (!items || items.length === 0) {
+        vscode.window.showInformationMessage('LFAI: 知识暂存箱为空，请先在 ChatGPT / Gemini 中复制技术对话。');
+        return;
+      }
+
+      isExtracting = true;
+      try {
+        await vscode.window.withProgress(
+          {
+            location: vscode.ProgressLocation.Notification,
+            title: `LFAI: 正在批量分析暂存箱中的 ${items.length} 段技术对话...`,
+            cancellable: true,
+          },
+          async (progress, token) => {
+            progress.report({ increment: 30, message: '正在调用 LLM 提炼对话内参与架构要点...' });
+            const contents = items.map((it) => it.content);
+            const digest = await LLMClient.extractInboxLearnings(contents, token);
+
+            progress.report({ increment: 40, message: '正在合并归档至今日 Markdown 笔记...' });
+
+            // Merge with existing digest if today already has cards
+            const existing = NoteManager.getCachedDigest(context);
+            if (existing && existing.cards && existing.cards.length > 0) {
+              digest.cards = [...digest.cards, ...existing.cards];
+              digest.totalCards = digest.cards.length;
+            }
+
+            await NoteManager.saveDigest(context, digest);
+            await InboxManager.clearInbox(context);
+
+            sidebarProvider.updateDigest(digest);
+            sidebarProvider.refresh();
+            await updateStatusBar();
+
+            vscode.window.showInformationMessage(
+              `🎉 LFAI: 暂存箱提炼完成！已生成 ${digest.cards.length} 张原理卡片，已清空暂存箱。`
+            );
+          }
+        );
+      } catch (err: unknown) {
+        const errorMsg = err instanceof Error ? err.message : String(err);
+        vscode.window.showErrorMessage(`LFAI 暂存箱提炼失败: ${errorMsg}`);
+      } finally {
+        isExtracting = false;
+      }
+    }
+  );
+  context.subscriptions.push(extractInboxCommand);
+
+  // 10. Command: Clear Inbox
+  const clearInboxCommand = vscode.commands.registerCommand(
+    'lfai.clearInbox',
+    async () => {
+      await InboxManager.clearInbox(context);
+      vscode.window.showInformationMessage('LFAI: 知识暂存箱已清空。');
+    }
+  );
+  context.subscriptions.push(clearInboxCommand);
 }
 
 export function deactivate() {}
