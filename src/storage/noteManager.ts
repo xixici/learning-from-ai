@@ -1,4 +1,4 @@
-import * as fs from 'fs';
+import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { DailyDigest } from '../types';
@@ -23,14 +23,12 @@ export class NoteManager {
     const relDir = config.get<string>('notesDir', '.lfai/daily');
     const targetDir = path.join(workspaceFolders[0].uri.fsPath, relDir);
 
-    if (!fs.existsSync(targetDir)) {
-      fs.mkdirSync(targetDir, { recursive: true });
-    }
+    await fs.mkdir(targetDir, { recursive: true });
 
     const filePath = path.join(targetDir, `${digest.date}.md`);
     const mdContent = this.formatDigestToMarkdown(digest);
 
-    fs.writeFileSync(filePath, mdContent, 'utf-8');
+    await fs.writeFile(filePath, mdContent, 'utf-8');
     return filePath;
   }
 
@@ -50,7 +48,9 @@ export class NoteManager {
     const relDir = config.get<string>('notesDir', '.lfai/daily');
     const filePath = path.join(workspaceFolders[0].uri.fsPath, relDir, `${today}.md`);
 
-    if (!fs.existsSync(filePath)) {
+    try {
+      await fs.access(filePath);
+    } catch {
       vscode.window.showInformationMessage(
         `LFAI: 今日笔记尚未生成，请先点击「提炼今日代码与 AI 考点」。`
       );

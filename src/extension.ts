@@ -4,7 +4,9 @@ import { collectActiveSelection } from './collector/selectionCollector';
 import { LLMClient } from './engine/llmClient';
 import { NoteManager } from './storage/noteManager';
 import { LFAISidebarProvider } from './ui/sidebarProvider';
-import { DailyDigest } from './types';
+import type { DailyDigest } from './types';
+
+let isExtracting = false;
 
 export function activate(context: vscode.ExtensionContext) {
   // 1. Register Sidebar Webview Provider
@@ -37,6 +39,9 @@ export function activate(context: vscode.ExtensionContext) {
   const extractTodayCommand = vscode.commands.registerCommand(
     'lfai.extractTodayLearnings',
     async () => {
+      if (isExtracting) { return; }
+      isExtracting = true;
+      try {
       await vscode.window.withProgress(
         {
           location: vscode.ProgressLocation.Notification,
@@ -107,6 +112,9 @@ export function activate(context: vscode.ExtensionContext) {
           }
         }
       );
+      } finally {
+        isExtracting = false;
+      }
     }
   );
   context.subscriptions.push(extractTodayCommand);
@@ -115,6 +123,9 @@ export function activate(context: vscode.ExtensionContext) {
   const extractSelectionCommand = vscode.commands.registerCommand(
     'lfai.extractSelection',
     async () => {
+      if (isExtracting) { return; }
+      isExtracting = true;
+      try {
       const req = collectActiveSelection();
       if (!req) {
         return;
@@ -129,11 +140,18 @@ export function activate(context: vscode.ExtensionContext) {
         async (progress, token) => {
           progress.report({ increment: 40, message: '正在深度解析代码片段...' });
 
-          const digest = await LLMClient.extractLearnings(
-            req.codeContext,
-            req.fileHints,
-            token
-          );
+          let digest: DailyDigest;
+          try {
+            digest = await LLMClient.extractLearnings(
+              req.codeContext,
+              req.fileHints,
+              token
+            );
+          } catch (err: unknown) {
+            const msg = err instanceof Error ? err.message : String(err);
+            vscode.window.showErrorMessage(`LFAI 提炼失败: ${msg}`);
+            return;
+          }
 
           await NoteManager.saveDigest(context, digest);
           sidebarProvider.updateDigest(digest);
@@ -144,6 +162,9 @@ export function activate(context: vscode.ExtensionContext) {
           );
         }
       );
+      } finally {
+        isExtracting = false;
+      }
     }
   );
   context.subscriptions.push(extractSelectionCommand);

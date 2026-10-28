@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { ExtractionRequest } from '../types';
 
-const IGNORED_EXTENSIONS = new Set([
+const IGNORED_EXTENSIONS = [
   '.lock',
   '.min.js',
   '.min.css',
@@ -22,7 +22,7 @@ const IGNORED_EXTENSIONS = new Set([
   '.zip',
   '.tar',
   '.gz',
-]);
+];
 
 const IGNORED_PATHS = [
   'node_modules',
@@ -42,6 +42,7 @@ function runGit(args: string[], cwd: string): Promise<string> {
   return new Promise((resolve) => {
     child_process.execFile('git', args, { cwd, maxBuffer: 10 * 1024 * 1024 }, (err, stdout) => {
       if (err) {
+        console.warn('[LFAI] git command failed:', args.join(' '), err?.message);
         resolve('');
       } else {
         resolve(stdout.trim());
@@ -67,10 +68,10 @@ export async function collectTodayGitDiff(): Promise<ExtractionRequest | null> {
 
   // 2. Collect diffs:
   // a) Unstaged and staged diffs in working tree
-  const workingDiff = await runGit(['diff', 'HEAD'], rootPath);
-
-  // b) Diffs from today's commits
-  const todayCommitsDiff = await runGit(['log', '--since=midnight', '-p', '--stat'], rootPath);
+  const [workingDiff, todayCommitsDiff] = await Promise.all([
+    runGit(['diff', 'HEAD'], rootPath),
+    runGit(['log', '--since=midnight', '-p', '--stat'], rootPath),
+  ]);
 
   let combinedDiff = '';
   if (workingDiff) {
@@ -114,7 +115,7 @@ function filterDiff(rawDiff: string): string {
   for (const line of lines) {
     if (line.startsWith('diff --git ')) {
       skippingFile = IGNORED_PATHS.some((p) => line.includes(p)) ||
-        Array.from(IGNORED_EXTENSIONS).some((ext) => line.includes(ext));
+        IGNORED_EXTENSIONS.some((ext) => line.includes(ext));
     }
     if (!skippingFile) {
       result.push(line);

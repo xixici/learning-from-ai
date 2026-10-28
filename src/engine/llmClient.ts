@@ -60,17 +60,21 @@ export class LLMClient {
       ),
     ];
 
-    const source = new vscode.CancellationTokenSource();
-    const token = cancellationToken || source.token;
+    const source = cancellationToken ? undefined : new vscode.CancellationTokenSource();
+    const token = cancellationToken || source!.token;
 
-    const chatResponse = await model.sendRequest(messages, {}, token);
+    try {
+      const chatResponse = await model.sendRequest(messages, {}, token);
 
-    let fullText = '';
-    for await (const fragment of chatResponse.text) {
-      fullText += fragment;
+      let fullText = '';
+      for await (const fragment of chatResponse.text) {
+        fullText += fragment;
+      }
+
+      return fullText;
+    } finally {
+      source?.dispose();
     }
-
-    return fullText;
   }
 
   private static async callCustomAPI(userPrompt: string): Promise<string> {
@@ -102,6 +106,7 @@ export class LLMClient {
         ],
         temperature: 0.3,
       }),
+      signal: AbortSignal.timeout(60_000),
     });
 
     if (!res.ok) {
@@ -117,9 +122,10 @@ export class LLMClient {
 
   private static parseDigestResponse(rawText: string, fileHints?: string[]): DailyDigest {
     let cleanJson = rawText.trim();
-    // Strip markdown code block if present
-    if (cleanJson.startsWith('```')) {
-      cleanJson = cleanJson.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '').trim();
+    // Try to extract JSON object from possible markdown/text wrapping
+    const jsonMatch = cleanJson.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      cleanJson = jsonMatch[0];
     }
 
     try {

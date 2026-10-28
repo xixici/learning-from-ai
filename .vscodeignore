@@ -19,3 +19,9 @@ node_modules/**
 *.log
 .DS_Store
 Thumbs.db
+
+# Docs not needed in package
+CONTRIBUTING.md
+CODE_OF_CONDUCT.md
+SECURITY.md
+CHANGELOG.md

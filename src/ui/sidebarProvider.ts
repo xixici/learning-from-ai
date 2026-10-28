@@ -66,8 +66,8 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
   private getHtmlForWebview(digest?: DailyDigest): string {
     const todayStr = new Date().toISOString().split('T')[0];
 
-    const cardsJson = JSON.stringify(digest?.cards || []);
-    const workSummaryJson = JSON.stringify(digest?.workSummary || null);
+    const cardsJson = JSON.stringify(digest?.cards || []).replace(/</g, '\\u003c');
+    const workSummaryJson = JSON.stringify(digest?.workSummary || null).replace(/</g, '\\u003c');
     const summaryText = digest?.summary || '暂无提炼数据，点击下方按钮开始分析今日代码。';
     const totalCount = digest?.cards?.length || 0;
 
