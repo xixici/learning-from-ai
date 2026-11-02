@@ -11,6 +11,7 @@ export interface WorkSummary {
   title: string;              // 今日交付与工作亮点 (可直接作为 Standup / 日报 / PR 标题)
   deliverables: string[];     // 今日完成的核心功能与重构项 (3-5 条清单)
   changedModules?: string[];  // 涉及的核心模块/技术领域
+  dailyReportText?: string;   // 专供直接汇报粘贴的客户工作/技术工作纯文本排版
 }
 
 export interface LearningCard {

@@ -96,7 +96,13 @@ export function activate(context: vscode.ExtensionContext) {
             );
           } catch (err: unknown) {
             const msg = err instanceof Error ? err.message : String(err);
-            vscode.window.showErrorMessage(`LFAI 提炼失败: ${msg}`);
+            const action = await vscode.window.showErrorMessage(
+              `LFAI 提炼失败: ${msg}`,
+              '查看详细日志'
+            );
+            if (action === '查看详细日志') {
+              LLMClient.showLog();
+            }
             return;
           }
 
@@ -399,6 +405,16 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
   context.subscriptions.push(extractSingleInboxItemCommand);
+
+  // 15. Command: Open LLM Log
+  const openLLMLogCommand = vscode.commands.registerCommand(
+    'lfai.openLLMLog',
+    () => {
+      LLMClient.showLog();
+    }
+  );
+  context.subscriptions.push(openLLMLogCommand);
+  context.subscriptions.push(LLMClient.getLogChannel());
 }
 
 export function deactivate() {}

@@ -3,6 +3,25 @@ import { DailyDigest, LearningCard } from '../types';
 import { EXTRACTION_SYSTEM_PROMPT, buildUserPrompt, buildInboxPrompt } from './prompt';
 
 export class LLMClient {
+  private static outputChannel?: vscode.OutputChannel;
+
+  public static getLogChannel(): vscode.OutputChannel {
+    if (!this.outputChannel) {
+      this.outputChannel = vscode.window.createOutputChannel('LFAI: LLM 模型调用日志');
+    }
+    return this.outputChannel;
+  }
+
+  public static log(message: string): void {
+    const channel = this.getLogChannel();
+    const timeStr = new Date().toLocaleTimeString();
+    channel.appendLine(`[${timeStr}] ${message}`);
+  }
+
+  public static showLog(): void {
+    this.getLogChannel().show(true);
+  }
+
   public static async extractLearnings(
     codeContext: string,
     fileHints?: string[],
@@ -111,8 +130,10 @@ export class LLMClient {
     const baseUrl = config.get<string>('customApiBaseUrl', 'https://api.deepseek.com/v1');
     const apiKey = config.get<string>('customApiKey', '');
     const model = config.get<string>('customModel', 'deepseek-chat');
+    const timeoutSec = Math.max(30, config.get<number>('customApiTimeout', 180));
 
     if (!apiKey) {
+      this.log('未配置自定义 API Key，跳过自定义 API 调用并转为兜底示范。');
       vscode.window.showInformationMessage(
         'LFAI: 未检测到 Copilot 或自定义 API Key。已为您展示智能分析样例，您可在设置中配置 `lfai.customApiKey`。'
       );
@@ -120,33 +141,71 @@ export class LLMClient {
     }
 
     const url = `${baseUrl.replace(/\/+$/, '')}/chat/completions`;
+    const maskedKey = apiKey.length > 8 ? `${apiKey.slice(0, 4)}...${apiKey.slice(-4)}` : '****';
 
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model,
-        messages: [
-          { role: 'system', content: EXTRACTION_SYSTEM_PROMPT },
-          { role: 'user', content: userPrompt },
-        ],
-        temperature: 0.3,
-      }),
-      signal: AbortSignal.timeout(60_000),
-    });
+    this.log(`--------------------------------------------------`);
+    this.log(`发起自定义 LLM API 请求:`);
+    this.log(`- 目标接口: ${url}`);
+    this.log(`- 使用模型: ${model}`);
+    this.log(`- API Key: ${maskedKey}`);
+    this.log(`- 请求超时: ${timeoutSec} 秒`);
+    this.log(`- Prompt 大小: ${userPrompt.length} 字符`);
 
-    if (!res.ok) {
-      throw new Error(`API 请求失败 [HTTP ${res.status}]: ${await res.text()}`);
+    const startTime = Date.now();
+
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: 'system', content: EXTRACTION_SYSTEM_PROMPT },
+            { role: 'user', content: userPrompt },
+          ],
+          temperature: 0.3,
+        }),
+        signal: AbortSignal.timeout(timeoutSec * 1000),
+      });
+
+      const duration = ((Date.now() - startTime) / 1000).toFixed(1);
+      this.log(`API 响应完成，HTTP 状态码: ${res.status} (耗时: ${duration}s)`);
+
+      if (!res.ok) {
+        const errorBody = await res.text();
+        this.log(`❌ API 请求返回错误状态码 [HTTP ${res.status}]: ${errorBody}`);
+        throw new Error(`API 请求失败 [HTTP ${res.status}]: ${errorBody}`);
+      }
+
+      const data = (await res.json()) as {
+        choices?: Array<{ message?: { content?: string; reasoning_content?: string } }>;
+        usage?: { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number; reasoning_tokens?: number };
+      };
+
+      if (data.usage) {
+        this.log(`- Token 用量: 提示词=${data.usage.prompt_tokens || 0}, 生成=${data.usage.completion_tokens || 0}, 思考/推理=${data.usage.reasoning_tokens || 0}, 总计=${data.usage.total_tokens || 0}`);
+      }
+
+      const content = data.choices?.[0]?.message?.content || '';
+      this.log(`✅ 成功获取响应正文，长度: ${content.length} 字符`);
+      return content;
+    } catch (err: unknown) {
+      const duration = ((Date.now() - startTime) / 1000).toFixed(1);
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      this.log(`❌ 自定义 API 调用异常 (已耗时: ${duration}s): ${errorMsg}`);
+
+      if (errorMsg.includes('timed out') || errorMsg.includes('TimeoutError') || errorMsg.includes('aborted')) {
+        this.log(`⚠️ 检测到请求超时！`);
+        this.log(`可能原因：`);
+        this.log(`1. 您配置的模型（如 ${model}）是深度思考/推理模型（带思维链），生成大量思考 token 耗时较长；`);
+        this.log(`2. 可在 VS Code 设置中增大 \`lfai.customApiTimeout\`（如调至 240~300 秒）；`);
+        this.log(`3. 或者推荐换用更轻量高效的模型，例如 \`glm-5.3-flash\` 或 \`deepseek-chat\`。`);
+      }
+      throw err;
     }
-
-    const data = (await res.json()) as {
-      choices?: Array<{ message?: { content?: string } }>;
-    };
-
-    return data.choices?.[0]?.message?.content || '';
   }
 
   private static parseDigestResponse(rawText: string, fileHints?: string[]): DailyDigest {
@@ -198,6 +257,7 @@ export class LLMClient {
       summary: '今日重点：异步流式消费背压机制、双通道容灾架构与防御性缓冲治理',
       workSummary: {
         title: '完成认知分析引擎升级与 VS Code 侧边栏工作流集成',
+        dailyReportText: `客户工作：\n1. 某车企客户A\n   测试平台规划\n2. 智能座舱客户B\n   使用反馈跟进\n3. 合作方C、合作方D、客户E\n   项目跟进\n\n技术工作：\n1. 某车企客户A\n   需求管理核心模块开发\n   后端接口梳理\n2. 智能体平台研发\n   后续需求梳理\n3. 智能审核系统\n   现场交付与培训\n4. 某整车智联业务\n   技术方案跟进`,
         deliverables: [
           '重构提示词工程，引入深水区探针与负向过滤，大幅提升知识提取密度',
           '实现工作交付层 (Standup/PR) 与技术复盘卡片双轨输出架构',

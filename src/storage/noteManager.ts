@@ -63,6 +63,10 @@ export class NoteManager {
 
   public static formatWorkSummaryForClipboard(digest: DailyDigest): string {
     const ws = digest.workSummary;
+    if (ws?.dailyReportText && ws.dailyReportText.trim()) {
+      return ws.dailyReportText.trim();
+    }
+
     const lines: string[] = [
       `### 📋 工作交付与 Standup (${digest.date})`,
     ];
@@ -102,14 +106,23 @@ export class NoteManager {
 
     // 1. Work Deliverables Layer (对公可汇报)
     if (digest.workSummary) {
-      lines.push(`## 📋 今日工作交付 (Standup / PR Ready)`);
+      lines.push(`## 📋 今日工作交付 (Standup / 日报)`);
       lines.push(``);
       lines.push(`**交付亮点**：${digest.workSummary.title}`);
       lines.push(``);
-      lines.push(`**完成事项清单**：`);
-      digest.workSummary.deliverables.forEach((item) => {
-        lines.push(`- [x] ${item}`);
-      });
+      if (digest.workSummary.dailyReportText) {
+        lines.push(`**日报汇报排版**：`);
+        lines.push('```text');
+        lines.push(digest.workSummary.dailyReportText.trim());
+        lines.push('```');
+        lines.push(``);
+      }
+      if (digest.workSummary.deliverables && digest.workSummary.deliverables.length > 0) {
+        lines.push(`**完成事项清单**：`);
+        digest.workSummary.deliverables.forEach((item) => {
+          lines.push(`- [x] ${item}`);
+        });
+      }
       if (digest.workSummary.changedModules && digest.workSummary.changedModules.length > 0) {
         lines.push(``);
         lines.push(`*涉及模块：${digest.workSummary.changedModules.map((m) => `\`${m}\``).join(', ')}*`);

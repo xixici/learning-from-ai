@@ -252,6 +252,18 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
     .work-summary-list li {
       margin-bottom: 3px;
     }
+    .work-summary-report {
+      white-space: pre-wrap;
+      font-family: inherit;
+      background: var(--vscode-editor-background);
+      border: 1px solid var(--vscode-widget-border, rgba(255, 255, 255, 0.1));
+      border-radius: 4px;
+      padding: 8px 10px;
+      margin-top: 6px;
+      line-height: 1.6;
+      font-size: 11px;
+      user-select: text;
+    }
 
     .filter-tabs {
       display: flex;
@@ -698,10 +710,10 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
     </div>
     <div id="workSummaryBody" class="work-summary-body">
       <div id="workSummaryTitle" style="font-weight: 600; margin-bottom: 4px; color: var(--accent);"></div>
+      <div id="workSummaryReport" class="work-summary-report" style="display: none;"></div>
       <ul id="workSummaryList" class="work-summary-list"></ul>
     </div>
   </div>
-
   <div class="filter-tabs">
     <button class="tab-btn active" data-filter="all">全部 (${totalCount})</button>
     <button class="tab-btn" data-filter="gotcha">⚠️ 避坑</button>
@@ -792,6 +804,7 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
     function renderWorkSummary() {
       const box = document.getElementById('workSummaryBox');
       const titleEl = document.getElementById('workSummaryTitle');
+      const reportEl = document.getElementById('workSummaryReport');
       const listEl = document.getElementById('workSummaryList');
 
       if (!workSummaryData) {
@@ -801,14 +814,23 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
 
       box.style.display = 'block';
       titleEl.innerText = workSummaryData.title || '今日工作完成摘要';
-      listEl.innerHTML = '';
 
-      const items = workSummaryData.deliverables || [];
-      items.forEach(item => {
-        const li = document.createElement('li');
-        li.innerText = item;
-        listEl.appendChild(li);
-      });
+      if (workSummaryData.dailyReportText && workSummaryData.dailyReportText.trim()) {
+        reportEl.innerText = workSummaryData.dailyReportText.trim();
+        reportEl.style.display = 'block';
+        listEl.style.display = 'none';
+      } else {
+        reportEl.style.display = 'none';
+        listEl.style.display = 'block';
+        listEl.innerHTML = '';
+
+        const items = workSummaryData.deliverables || [];
+        items.forEach(item => {
+          const li = document.createElement('li');
+          li.innerText = item;
+          listEl.appendChild(li);
+        });
+      }
     }
 
     function renderCards() {

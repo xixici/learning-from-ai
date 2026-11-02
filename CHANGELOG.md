@@ -15,6 +15,21 @@ This project adheres to [Semantic Versioning](https://semver.org/) and [Keep a C
 - Team/workspace-shared learning card mode
 
 ---
+## [0.1.7] — 2026-11-02
+
+### Added
+- **Hierarchical Daily Report Layout (结构化日报排版与编号缩进)**:
+  - Overhauled extraction prompts to produce structured `dailyReportText` split into `客户工作：` (Client Work) and `技术工作：` (Engineering).
+  - Sequential numerical numbering (`1, 2, 3, 4`) for customer/project lines, with indented action items formatted for chat/email reports.
+  - `📋 复制日报/PR` one-click action now directly copies clean indented plaintext ready for immediate pasting into team chats.
+  - Native sidebar and Markdown note rendering for structured daily reports.
+- **Dedicated LLM Output Channel & Adaptive Timeout (模型调用日志流与自适应超时控制)**:
+  - Integrated `LFAI: LLM 模型调用日志` output channel (`lfai.openLLMLog`) tracking request duration, model name, HTTP status, and detailed token consumption (including `reasoning_tokens` for deep reasoning models).
+  - New configuration `lfai.customApiTimeout` with default extended from 60s to 180s (3 minutes) to support long thinking chains.
+  - Error notification now includes a **"查看详细日志"** button for instant troubleshooting.
+  - Strict privacy sanitization and API key masking across all log streams and prompt examples.
+
+---
 ## [0.1.6] — 2026-11-02
 
 ### Added
@@ -150,7 +165,8 @@ This project adheres to [Semantic Versioning](https://semver.org/) and [Keep a C
 
 ---
 
-[Unreleased]: https://github.com/xixici/learning-from-ai/compare/v0.1.6...HEAD
+[Unreleased]: https://github.com/xixici/learning-from-ai/compare/v0.1.7...HEAD
+[0.1.7]: https://github.com/xixici/learning-from-ai/compare/v0.1.6...v0.1.7
 [0.1.6]: https://github.com/xixici/learning-from-ai/compare/v0.1.5...v0.1.6
 [0.1.5]: https://github.com/xixici/learning-from-ai/compare/v0.1.4...v0.1.5
 [0.1.4]: https://github.com/xixici/learning-from-ai/compare/v0.1.3...v0.1.4
