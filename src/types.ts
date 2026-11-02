@@ -52,4 +52,5 @@ export interface InboxItem {
   content: string;
   source: 'clipboard' | 'manual';
   detectedType: 'chat' | 'code' | 'snippet';
+  charCount?: number;
 }

@@ -11,15 +11,13 @@ export class InboxManager {
   public static async getItems(context: vscode.ExtensionContext): Promise<InboxItem[]> {
     // 1. Try memory / workspaceState cache first
     const cached = context.workspaceState.get<InboxItem[]>(this.STORAGE_KEY);
-    if (cached && Array.isArray(cached) && cached.length > 0) {
+    if (cached !== undefined && Array.isArray(cached)) {
       return cached;
     }
 
     // 2. Fallback to file storage
     const items = await this.readItemsFromFile();
-    if (items.length > 0) {
-      await context.workspaceState.update(this.STORAGE_KEY, items);
-    }
+    await context.workspaceState.update(this.STORAGE_KEY, items);
     return items;
   }
 
@@ -54,8 +52,8 @@ export class InboxManager {
       content: trimmed,
       source,
       detectedType,
+      charCount: trimmed.length,
     };
-
     items.unshift(newItem); // Newest first
 
     // Limit maximum inbox items to 50
@@ -70,6 +68,21 @@ export class InboxManager {
     return newItem;
   }
 
+
+  public static async getItem(
+    context: vscode.ExtensionContext,
+    id: string
+  ): Promise<InboxItem | undefined> {
+    const items = await this.getItems(context);
+    return items.find((item) => item.id === id);
+  }
+
+  public static async getLatestItem(
+    context: vscode.ExtensionContext
+  ): Promise<InboxItem | undefined> {
+    const items = await this.getItems(context);
+    return items.length > 0 ? items[0] : undefined;
+  }
   public static async removeItem(
     context: vscode.ExtensionContext,
     id: string

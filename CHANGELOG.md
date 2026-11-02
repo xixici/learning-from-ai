@@ -15,6 +15,26 @@ This project adheres to [Semantic Versioning](https://semver.org/) and [Keep a C
 - Team/workspace-shared learning card mode
 
 ---
+## [0.1.6] — 2026-11-02
+
+### Added
+- **Visual Clipboard Monitor & History Panel (剪贴板监听与复制记录可视化面板)**:
+  - Permanent, interactive clipboard inbox panel in sidebar with real-time status light (`🟢 实时监听中`), pending count badge, and collapsible view.
+  - Rich card layout for every captured clipboard entry:
+    - Category badges (`🤖 AI 对话`, `💻 代码块`, `📝 技术片段`)
+    - Relative timestamps (`刚刚`, `X分钟前`, `HH:mm:ss`) and character count display
+    - Inline full-text expander (`📖 展开全文 ▼`) to inspect long conversations directly without truncation
+    - Single item quick actions: `⚡ 单独提炼`, `📋 复制`, `📄 独立窗口查看`, `✕ 删除`
+  - User-friendly empty state with one-click `📥 立即将当前剪贴板收入暂存箱 (测试复制)` verification button.
+- **Broadened Heuristic Filtering & Force Capture (智能特征扩充与强制收录模式)**:
+  - Greatly expanded technical keyword library and programming syntax detectors, eliminating silent drops on valid technical discussions.
+  - Manual capture command `lfai.captureClipboardNow` now runs in forced mode, guaranteeing capture of user-selected clipboard text.
+- **Dedicated Clipboard Logger & Output Channel (剪贴板监听实时日志流)**:
+  - Integrated `LFAI: 剪贴板监听日志` output channel tracking every clipboard change event, capture status, and filter reason in real time.
+  - New commands: `lfai.showClipboardRecords`, `lfai.openClipboardLog`, `lfai.openInboxItemDoc`, `lfai.extractSingleInboxItem`.
+
+---
+
 ## [0.1.5] — 2026-10-28
 
 ### Added
@@ -130,7 +150,8 @@ This project adheres to [Semantic Versioning](https://semver.org/) and [Keep a C
 
 ---
 
-[Unreleased]: https://github.com/xixici/learning-from-ai/compare/v0.1.5...HEAD
+[Unreleased]: https://github.com/xixici/learning-from-ai/compare/v0.1.6...HEAD
+[0.1.6]: https://github.com/xixici/learning-from-ai/compare/v0.1.5...v0.1.6
 [0.1.5]: https://github.com/xixici/learning-from-ai/compare/v0.1.4...v0.1.5
 [0.1.4]: https://github.com/xixici/learning-from-ai/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/xixici/learning-from-ai/compare/v0.1.2...v0.1.3

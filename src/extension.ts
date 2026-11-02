@@ -217,16 +217,16 @@ export function activate(context: vscode.ExtensionContext) {
   );
   context.subscriptions.push(refreshSidebarCommand);
 
-  // 8. Command: Capture Current Clipboard to Inbox
+  // 8. Command: Capture Current Clipboard to Inbox (Force = true for manual trigger)
   const captureClipboardCommand = vscode.commands.registerCommand(
     'lfai.captureClipboardNow',
     async () => {
       const watcher = ClipboardWatcher.getInstance(context);
-      const item = await watcher.checkClipboardNow();
+      const item = await watcher.checkClipboardNow(true);
       if (item) {
-        vscode.window.showInformationMessage('LFAI: 已成功捕获当前剪贴板并存入暂存箱！');
-      } else {
-        vscode.window.showInformationMessage('LFAI: 剪贴板未检测到新的 AI 对话或技术内容。');
+        vscode.window.showInformationMessage(
+          `🎉 LFAI: 已成功捕获当前剪贴板（${item.charCount} 字符）并存入暂存箱！`
+        );
       }
     }
   );
@@ -299,6 +299,106 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
   context.subscriptions.push(clearInboxCommand);
+
+  // 11. Command: Show Clipboard Records
+  const showClipboardRecordsCommand = vscode.commands.registerCommand(
+    'lfai.showClipboardRecords',
+    async () => {
+      await vscode.commands.executeCommand('workbench.view.extension.lfai-container');
+      sidebarProvider.refresh();
+    }
+  );
+  context.subscriptions.push(showClipboardRecordsCommand);
+
+  // 12. Command: Open Clipboard Log Channel
+  const openClipboardLogCommand = vscode.commands.registerCommand(
+    'lfai.openClipboardLog',
+    () => {
+      const watcher = ClipboardWatcher.getInstance(context);
+      watcher.showLog();
+    }
+  );
+  context.subscriptions.push(openClipboardLogCommand);
+
+  // 13. Command: Open Inbox Item in Document Editor
+  const openInboxItemDocCommand = vscode.commands.registerCommand(
+    'lfai.openInboxItemDoc',
+    async (id?: string) => {
+      if (!id) {
+        return;
+      }
+      const item = await InboxManager.getItem(context, id);
+      if (!item) {
+        vscode.window.showWarningMessage('LFAI: 未找到该暂存条目。');
+        return;
+      }
+      const doc = await vscode.workspace.openTextDocument({
+        content: item.content,
+        language: item.detectedType === 'code' ? 'typescript' : 'markdown',
+      });
+      await vscode.window.showTextDocument(doc, { preview: true });
+    }
+  );
+  context.subscriptions.push(openInboxItemDocCommand);
+
+  // 14. Command: Extract Single Inbox Item
+  const extractSingleInboxItemCommand = vscode.commands.registerCommand(
+    'lfai.extractSingleInboxItem',
+    async (id?: string) => {
+      if (!id) {
+        return;
+      }
+      if (isExtracting) {
+        vscode.window.showInformationMessage('LFAI: 正在提炼中，请稍候...');
+        return;
+      }
+      const item = await InboxManager.getItem(context, id);
+      if (!item) {
+        vscode.window.showWarningMessage('LFAI: 未找到该暂存条目。');
+        return;
+      }
+
+      isExtracting = true;
+      try {
+        await vscode.window.withProgress(
+          {
+            location: vscode.ProgressLocation.Notification,
+            title: `LFAI: 正在提炼此条对话内容 (${item.preview.slice(0, 30)}...)...`,
+            cancellable: true,
+          },
+          async (progress, token) => {
+            progress.report({ increment: 30, message: '正在调用 LLM 提炼深度考点...' });
+            const digest = await LLMClient.extractInboxLearnings([item.content], token);
+
+            progress.report({ increment: 40, message: '正在合并归档至今日笔记...' });
+
+            const existing = NoteManager.getCachedDigest(context);
+            if (existing && existing.cards && existing.cards.length > 0) {
+              digest.cards = [...digest.cards, ...existing.cards];
+              digest.totalCards = digest.cards.length;
+            }
+
+            await NoteManager.saveDigest(context, digest);
+            await InboxManager.removeItem(context, item.id);
+
+            sidebarProvider.updateDigest(digest);
+            sidebarProvider.refresh();
+            await updateStatusBar();
+
+            vscode.window.showInformationMessage(
+              `🎉 LFAI: 该条对话已完成提炼！新增 ${digest.cards.length} 张原理卡片。`
+            );
+          }
+        );
+      } catch (err: unknown) {
+        const errorMsg = err instanceof Error ? err.message : String(err);
+        vscode.window.showErrorMessage(`LFAI 单条提炼失败: ${errorMsg}`);
+      } finally {
+        isExtracting = false;
+      }
+    }
+  );
+  context.subscriptions.push(extractSingleInboxItemCommand);
 }
 
 export function deactivate() {}

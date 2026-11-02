@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { DailyDigest, InboxItem } from '../types';
 import { NoteManager } from '../storage/noteManager';
 import { InboxManager } from '../storage/inboxManager';
-
+import { ClipboardWatcher } from '../collector/clipboardWatcher';
 export class LFAISidebarProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'lfai.sidebarView';
   private _view?: vscode.WebviewView;
@@ -62,6 +62,19 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
         case 'captureClipboard':
           await vscode.commands.executeCommand('lfai.captureClipboardNow');
           break;
+        case 'extractSingleInboxItem':
+          if (data.id) {
+            await vscode.commands.executeCommand('lfai.extractSingleInboxItem', data.id);
+          }
+          break;
+        case 'openClipboardLog':
+          await vscode.commands.executeCommand('lfai.openClipboardLog');
+          break;
+        case 'openInboxItemDoc':
+          if (data.id) {
+            await vscode.commands.executeCommand('lfai.openInboxItemDoc', data.id);
+          }
+          break;
       }
     });
   }
@@ -83,12 +96,29 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
 
     const digest = NoteManager.getCachedDigest(this._context);
     const inboxItems = await InboxManager.getItems(this._context);
-    this._view.webview.html = this.getHtmlForWebview(digest, inboxItems);
+    const watcher = ClipboardWatcher.getInstance(this._context);
+    const watcherInfo = {
+      isRunning: watcher.isRunning,
+      lastCheckTime: watcher.lastCheckTime,
+      lastCapturedTime: watcher.lastCapturedTime,
+      lastCapturedPreview: watcher.lastCapturedPreview,
+    };
+
+    this._view.webview.html = this.getHtmlForWebview(digest, inboxItems, watcherInfo);
   }
 
-  private getHtmlForWebview(digest?: DailyDigest, inboxItems: InboxItem[] = []): string {
+  private getHtmlForWebview(
+    digest?: DailyDigest,
+    inboxItems: InboxItem[] = [],
+    watcherInfo: { isRunning: boolean; lastCheckTime: number; lastCapturedTime: number; lastCapturedPreview?: string } = {
+      isRunning: true,
+      lastCheckTime: 0,
+      lastCapturedTime: 0,
+    }
+  ): string {
     const todayStr = new Date().toISOString().split('T')[0];
     const inboxItemsJson = JSON.stringify(inboxItems).replace(/</g, '\\u003c');
+    const watcherInfoJson = JSON.stringify(watcherInfo).replace(/</g, '\\u003c');
 
     const cardsJson = JSON.stringify(digest?.cards || []).replace(/</g, '\\u003c');
     const workSummaryJson = JSON.stringify(digest?.workSummary || null).replace(/</g, '\\u003c');
@@ -396,62 +426,208 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
       margin-bottom: 10px;
     }
     .inbox-box {
-      margin-top: 10px;
+      margin-top: 12px;
       background: var(--card-bg);
-      border: 1px solid var(--accent);
+      border: 1px solid var(--card-border);
       border-radius: 6px;
       padding: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     }
     .inbox-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 8px;
+      cursor: pointer;
+      user-select: none;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--card-border);
     }
     .inbox-title {
       font-weight: 600;
-      color: var(--badge-syntax);
+      color: var(--fg);
       display: flex;
       align-items: center;
       gap: 6px;
       font-size: 12px;
     }
-    .inbox-item {
-      background: var(--code-bg);
-      border-radius: 4px;
-      padding: 6px 8px;
-      margin-bottom: 6px;
+    .inbox-status-indicator {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #4ec9b0;
+      box-shadow: 0 0 6px #4ec9b0;
+    }
+    .inbox-status-bar {
       font-size: 11px;
+      color: var(--fg);
+      opacity: 0.75;
+      margin: 6px 0 8px 0;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-left: 3px solid var(--accent);
     }
-    .inbox-item-text {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      flex: 1;
-      margin-right: 6px;
+    .inbox-status-bar a {
+      color: var(--accent);
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .inbox-status-bar a:hover {
+      text-decoration: underline;
+    }
+    .inbox-empty-view {
+      text-align: center;
+      padding: 16px 8px;
+      background: var(--code-bg);
+      border-radius: 4px;
+      border: 1px dashed var(--card-border);
+      margin-bottom: 8px;
+    }
+    .inbox-empty-icon {
+      font-size: 24px;
+      margin-bottom: 4px;
+    }
+    .inbox-empty-title {
+      font-size: 11px;
+      font-weight: 600;
       color: var(--fg);
+      margin-bottom: 4px;
     }
-    .inbox-item-del {
+    .inbox-empty-desc {
+      font-size: 10px;
+      color: var(--fg);
+      opacity: 0.7;
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+    .inbox-card {
+      background: var(--code-bg);
+      border-radius: 4px;
+      padding: 8px;
+      margin-bottom: 8px;
+      border: 1px solid var(--card-border);
+      border-left: 3px solid var(--accent);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .inbox-card.newly-captured {
+      border-color: #4ec9b0;
+      box-shadow: 0 0 8px rgba(78, 201, 176, 0.4);
+    }
+    .inbox-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      font-size: 10px;
+    }
+    .inbox-meta-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .inbox-badge {
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 9px;
+      font-weight: 600;
+    }
+    .badge-chat {
+      background: rgba(156, 120, 240, 0.25);
+      color: #c586c0;
+      border: 1px solid rgba(156, 120, 240, 0.4);
+    }
+    .badge-code {
+      background: rgba(78, 201, 176, 0.2);
+      color: #4ec9b0;
+      border: 1px solid rgba(78, 201, 176, 0.4);
+    }
+    .badge-snippet {
+      background: rgba(220, 220, 170, 0.2);
+      color: #dcdcaa;
+      border: 1px solid rgba(220, 220, 170, 0.4);
+    }
+    .inbox-time {
+      opacity: 0.65;
+    }
+    .inbox-chars {
+      opacity: 0.65;
+    }
+    .inbox-card-del {
       cursor: pointer;
       opacity: 0.6;
       font-size: 12px;
-      padding: 2px 4px;
-      user-select: none;
+      padding: 1px 4px;
+      border-radius: 3px;
     }
-    .inbox-item-del:hover {
+    .inbox-card-del:hover {
       opacity: 1;
       color: #f48771;
+      background: rgba(244, 135, 113, 0.15);
     }
-    .inbox-actions {
+    .inbox-preview-text {
+      font-size: 11px;
+      line-height: 1.4;
+      color: var(--fg);
+      margin-bottom: 6px;
+      word-break: break-all;
+    }
+    .inbox-full-box {
+      display: none;
+      margin: 6px 0;
+      background: #111;
+      border: 1px solid var(--card-border);
+      border-radius: 4px;
+      max-height: 200px;
+      overflow-y: auto;
+      padding: 6px;
+    }
+    .inbox-full-pre {
+      font-family: var(--vscode-editor-font-family, monospace);
+      font-size: 11px;
+      white-space: pre-wrap;
+      word-break: break-all;
+      color: #d4d4d4;
+    }
+    .inbox-card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10px;
+      margin-top: 4px;
+      padding-top: 4px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .inbox-card-actions {
+      display: flex;
+      gap: 6px;
+    }
+    .inbox-btn-sm {
+      background: transparent;
+      border: 1px solid var(--card-border);
+      color: var(--fg);
+      border-radius: 3px;
+      padding: 2px 6px;
+      font-size: 10px;
+      cursor: pointer;
+    }
+    .inbox-btn-sm:hover {
+      background: var(--card-bg);
+      color: #fff;
+    }
+    .inbox-btn-extract-single {
+      background: var(--accent);
+      color: var(--accent-fg);
+      border: none;
+    }
+    .inbox-btn-extract-single:hover {
+      background: var(--accent-hover);
+    }
+    .inbox-actions-bar {
       display: flex;
       gap: 6px;
       margin-top: 8px;
     }
-    .inbox-btn-extract {
+    .inbox-btn-batch {
       flex: 2;
       background: var(--accent);
       color: var(--accent-fg);
@@ -462,7 +638,7 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
       font-weight: 600;
       cursor: pointer;
     }
-    .inbox-btn-clear {
+    .inbox-btn-clear-all {
       flex: 1;
       background: transparent;
       border: 1px solid var(--card-border);
@@ -491,15 +667,27 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
     </div>
   </div>
 
-  <div id="inboxBox" class="inbox-box" style="display: none;">
-    <div class="inbox-header">
-      <span class="inbox-title" id="inboxTitle">📥 AI 对话暂存箱</span>
-      <span style="font-size: 11px; opacity: 0.7;" id="inboxCountBadge">0 条</span>
+  <div id="inboxBox" class="inbox-box">
+    <div class="inbox-header" id="inboxHeader">
+      <span class="inbox-title">
+        <span class="inbox-status-indicator" id="inboxIndicator"></span>
+        <span>📋 剪贴板监听与暂存箱</span>
+      </span>
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <span style="font-size: 11px; opacity: 0.8; font-weight: 600;" id="inboxCountBadge">0 条</span>
+        <span id="inboxArrow" style="font-size: 10px;">▼</span>
+      </div>
     </div>
-    <div id="inboxList"></div>
-    <div class="inbox-actions">
-      <button class="inbox-btn-extract" id="btnExtractInbox">🧠 批量提炼暂存对话</button>
-      <button class="inbox-btn-clear" id="btnClearInbox">清空</button>
+    <div id="inboxBody">
+      <div class="inbox-status-bar">
+        <span id="inboxStatusText">🟢 实时监听中（在 ChatGPT/Gemini 复制即自动入库）</span>
+        <a id="btnOpenLog">查看日志</a>
+      </div>
+      <div id="inboxList"></div>
+      <div class="inbox-actions-bar" id="inboxActionsBar" style="display: none;">
+        <button class="inbox-btn-batch" id="btnExtractInbox">🧠 批量提炼全部暂存</button>
+        <button class="inbox-btn-clear-all" id="btnClearInbox">清空</button>
+      </div>
     </div>
   </div>
 
@@ -529,8 +717,9 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
     let cardsData = ${cardsJson};
     let workSummaryData = ${workSummaryJson};
     let inboxData = ${inboxItemsJson};
+    let watcherData = ${watcherInfoJson};
     let currentFilter = 'all';
-
+    let isInboxCollapsed = false;
     document.getElementById('btnExtract').addEventListener('click', () => {
       vscode.postMessage({ type: 'extractToday' });
     });
@@ -553,6 +742,19 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
 
     document.getElementById('btnClearInbox').addEventListener('click', () => {
       vscode.postMessage({ type: 'clearInbox' });
+    });
+
+    document.getElementById('inboxHeader').addEventListener('click', () => {
+      const body = document.getElementById('inboxBody');
+      const arrow = document.getElementById('inboxArrow');
+      isInboxCollapsed = !isInboxCollapsed;
+      body.style.display = isInboxCollapsed ? 'none' : 'block';
+      arrow.innerText = isInboxCollapsed ? '▲' : '▼';
+    });
+
+    document.getElementById('btnOpenLog').addEventListener('click', (e) => {
+      e.stopPropagation();
+      vscode.postMessage({ type: 'openClipboardLog' });
     });
 
     document.getElementById('workSummaryHeader').addEventListener('click', () => {
@@ -729,33 +931,133 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
 
 
     function renderInbox() {
-      const box = document.getElementById('inboxBox');
       const listEl = document.getElementById('inboxList');
       const badgeEl = document.getElementById('inboxCountBadge');
+      const actionsBar = document.getElementById('inboxActionsBar');
+      const statusText = document.getElementById('inboxStatusText');
 
-      if (!inboxData || inboxData.length === 0) {
-        box.style.display = 'none';
+      const count = (inboxData && inboxData.length) || 0;
+      badgeEl.innerText = count > 0 ? (count + ' 条待提炼') : '暂存箱空';
+
+      if (statusText) {
+        const runningStatus = watcherData && watcherData.isRunning ? '🟢 实时监听中' : '⏸️ 监听已暂停';
+        statusText.innerText = runningStatus + '（ChatGPT/Gemini 复制自动入库）';
+      }
+
+      listEl.innerHTML = '';
+
+      if (count === 0) {
+        actionsBar.style.display = 'none';
+        listEl.innerHTML = \`
+          <div class="inbox-empty-view">
+            <div class="inbox-empty-icon">📋</div>
+            <div class="inbox-empty-title">剪贴板后台实时监听中</div>
+            <div class="inbox-empty-desc">
+              在 ChatGPT、Gemini 等网页复制任意技术对话或代码，LFAI 会像 Ditto 一样自动在此捕获并记录。
+            </div>
+            <button class="inbox-btn-sm" id="btnTestCapture" style="padding: 4px 10px; font-weight: 600;">
+              📥 立即将当前剪贴板收入暂存箱 (测试复制)
+            </button>
+          </div>
+        \`;
+        const testBtn = document.getElementById('btnTestCapture');
+        if (testBtn) {
+          testBtn.addEventListener('click', () => {
+            vscode.postMessage({ type: 'captureClipboard' });
+          });
+        }
         return;
       }
 
-      box.style.display = 'block';
-      badgeEl.innerText = inboxData.length + ' 条待提炼';
-      listEl.innerHTML = '';
+      actionsBar.style.display = 'flex';
 
-      inboxData.forEach((item) => {
-        const itemEl = document.createElement('div');
-        itemEl.className = 'inbox-item';
-        itemEl.innerHTML = \`
-          <span class="inbox-item-text" title="\${escapeHtml(item.preview)}">💬 \${escapeHtml(item.preview)}</span>
-          <span class="inbox-item-del" title="删除本条">✕</span>
+      inboxData.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = 'inbox-card' + (index === 0 ? ' newly-captured' : '');
+
+        let typeBadgeClass = 'badge-chat';
+        let typeName = '🤖 AI 对话';
+        if (item.detectedType === 'code') {
+          typeBadgeClass = 'badge-code';
+          typeName = '💻 代码块';
+        } else if (item.detectedType === 'snippet') {
+          typeBadgeClass = 'badge-snippet';
+          typeName = '📝 技术片段';
+        }
+
+        const timeDisplay = formatRelativeTime(item.timestamp);
+        const charsDisplay = (item.charCount || item.content.length) + ' 字符';
+
+        card.innerHTML = \`
+          <div class="inbox-card-header">
+            <div class="inbox-meta-left">
+              <span class="inbox-badge \${typeBadgeClass}">\${typeName}</span>
+              <span class="inbox-time">🕒 \${timeDisplay}</span>
+              <span class="inbox-chars">(\${charsDisplay})</span>
+            </div>
+            <span class="inbox-card-del" title="删除此条记录">✕</span>
+          </div>
+          <div class="inbox-preview-text">\${escapeHtml(item.preview)}</div>
+          <div class="inbox-full-box" id="full-box-\${item.id}">
+            <pre class="inbox-full-pre">\${escapeHtml(item.content)}</pre>
+          </div>
+          <div class="inbox-card-footer">
+            <div class="inbox-card-actions">
+              <button class="inbox-btn-sm toggle-full-btn" data-id="\${item.id}">📖 展开全文 ▼</button>
+              <button class="inbox-btn-sm copy-btn" title="重新复制回剪贴板">📋 复制</button>
+              <button class="inbox-btn-sm open-doc-btn" title="在 VS Code 编辑器中查看">📄 查看</button>
+            </div>
+            <button class="inbox-btn-sm inbox-btn-extract-single extract-single-btn" data-id="\${item.id}">⚡ 单独提炼</button>
+          </div>
         \`;
-        itemEl.querySelector('.inbox-item-del').addEventListener('click', () => {
+
+        // Event: Delete single item
+        card.querySelector('.inbox-card-del').addEventListener('click', (e) => {
+          e.stopPropagation();
           vscode.postMessage({ type: 'removeInboxItem', id: item.id });
         });
-        listEl.appendChild(itemEl);
+
+        // Event: Toggle full text
+        const toggleBtn = card.querySelector('.toggle-full-btn');
+        const fullBox = card.querySelector('#full-box-' + item.id);
+        toggleBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const isHidden = fullBox.style.display === 'none' || !fullBox.style.display;
+          fullBox.style.display = isHidden ? 'block' : 'none';
+          toggleBtn.innerText = isHidden ? '收起全文 ▲' : '📖 展开全文 ▼';
+        });
+
+        // Event: Copy content
+        card.querySelector('.copy-btn').addEventListener('click', (e) => {
+          e.stopPropagation();
+          vscode.postMessage({ type: 'copyCode', code: item.content });
+        });
+
+        // Event: Open in doc
+        card.querySelector('.open-doc-btn').addEventListener('click', (e) => {
+          e.stopPropagation();
+          vscode.postMessage({ type: 'openInboxItemDoc', id: item.id });
+        });
+
+        // Event: Extract single item
+        card.querySelector('.extract-single-btn').addEventListener('click', (e) => {
+          e.stopPropagation();
+          vscode.postMessage({ type: 'extractSingleInboxItem', id: item.id });
+        });
+
+        listEl.appendChild(card);
       });
     }
 
+    function formatRelativeTime(ts) {
+      if (!ts) return '未知时间';
+      const diff = Math.floor((Date.now() - ts) / 1000);
+      if (diff < 10) return '刚刚';
+      if (diff < 60) return diff + '秒前';
+      if (diff < 3600) return Math.floor(diff / 60) + '分钟前';
+      const d = new Date(ts);
+      return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
     renderInbox();
     renderWorkSummary();
     renderCards();
