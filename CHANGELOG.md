@@ -15,6 +15,25 @@ This project adheres to [Semantic Versioning](https://semver.org/) and [Keep a C
 - Team/workspace-shared learning card mode
 
 ---
+## [0.1.8] — 2026-11-03
+
+### Added
+- **Date-Based Multi-Dimensional Archiving (按日期全方位归档机制)**:
+  - Daily Markdown notes now automatically sync structured snapshots to `.lfai/history/YYYY-MM-DD.json` for lossless historical retrieval.
+  - Clipboard inbox captures are now archived daily into `.lfai/inbox/YYYY-MM-DD.json` while maintaining the active unread pool.
+- **Date Picker & Historical Timeline Navigation (日期选择器与历史复盘导航)**:
+  - Sidebar header now integrates a responsive Date Navigator with `◀ Previous Day`, `Next Day ▶`, native date input picker, and one-click `Today` jump.
+  - Switching to any historical date instantly reloads its daily deliverables, learning cards, and clipboard archive.
+  - New command: `LFAI: 选择历史日期查看复盘看板` (`lfai.selectDate`).
+- **Weekly & Monthly Report Engine (周报与月报自动汇总引擎)**:
+  - Natural ISO week (`YYYY-Www`) and month (`YYYY-MM`) aggregator automatically merging cross-day deliverables.
+  - Intelligent cross-day deduplication, grouping by client/project with unified `1, 2, 3, 4` sequential numbering and clean indentation.
+  - Aggregates top-tier architecture & gotcha flashcards into periodic digests.
+  - Automatically saves formatted Markdown reports to `.lfai/weekly/` and `.lfai/monthly/`.
+  - Built-in preview modal in sidebar with one-click clipboard copy (`📋 复制此汇报到剪贴板`) and document viewer (`📝 查看 Markdown 报告`).
+  - 6 new commands: `lfai.generateWeeklyReport`, `lfai.copyWeeklyReport`, `lfai.openWeeklyReport`, `lfai.generateMonthlyReport`, `lfai.copyMonthlyReport`, `lfai.openMonthlyReport`.
+
+---
 ## [0.1.7] — 2026-11-02
 
 ### Added
@@ -165,7 +184,8 @@ This project adheres to [Semantic Versioning](https://semver.org/) and [Keep a C
 
 ---
 
-[Unreleased]: https://github.com/xixici/learning-from-ai/compare/v0.1.7...HEAD
+[Unreleased]: https://github.com/xixici/learning-from-ai/compare/v0.1.8...HEAD
+[0.1.8]: https://github.com/xixici/learning-from-ai/compare/v0.1.7...v0.1.8
 [0.1.7]: https://github.com/xixici/learning-from-ai/compare/v0.1.6...v0.1.7
 [0.1.6]: https://github.com/xixici/learning-from-ai/compare/v0.1.5...v0.1.6
 [0.1.5]: https://github.com/xixici/learning-from-ai/compare/v0.1.4...v0.1.5

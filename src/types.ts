@@ -49,9 +49,31 @@ export interface ExtractionRequest {
 export interface InboxItem {
   id: string;
   timestamp: number;
+  date?: string;              // 归档所属日期 YYYY-MM-DD
   preview: string;
   content: string;
   source: 'clipboard' | 'manual';
   detectedType: 'chat' | 'code' | 'snippet';
   charCount?: number;
+}
+
+export interface PeriodicReport {
+  type: 'weekly' | 'monthly';
+  periodId: string;           // 如 "2026-W45" 或 "2026-11"
+  startDate: string;          // 起始日期 YYYY-MM-DD
+  endDate: string;            // 截止日期 YYYY-MM-DD
+  title: string;              // 周期总结标题
+  overview: string;           // 重点概述
+  dailyReportText: string;    // 聚合去重后的客户工作与技术工作结构化排版
+  keyDeliverables: string[];  // 重点交付清单
+  topCards: LearningCard[];   // 精选高价值架构/考点卡片
+  includedDates: string[];    // 包含的有效工作日日期列表
+}
+
+export interface HistoryDateEntry {
+  date: string;               // YYYY-MM-DD
+  hasDigest: boolean;
+  hasInbox: boolean;
+  cardsCount?: number;
+  inboxCount?: number;
 }

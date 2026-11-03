@@ -6,6 +6,7 @@ import { NoteManager } from './storage/noteManager';
 import { LFAISidebarProvider } from './ui/sidebarProvider';
 import { ClipboardWatcher } from './collector/clipboardWatcher';
 import { InboxManager } from './storage/inboxManager';
+import { ReportManager } from './storage/reportManager';
 import type { DailyDigest } from './types';
 let isExtracting = false;
 
@@ -415,6 +416,121 @@ export function activate(context: vscode.ExtensionContext) {
   );
   context.subscriptions.push(openLLMLogCommand);
   context.subscriptions.push(LLMClient.getLogChannel());
+
+  // 16. Command: Select Historical Date
+  const selectDateCommand = vscode.commands.registerCommand(
+    'lfai.selectDate',
+    async () => {
+      const availableDates = await NoteManager.getAllAvailableDates();
+      const today = InboxManager.formatLocalDate();
+      if (!availableDates.includes(today)) {
+        availableDates.unshift(today);
+      }
+
+      const pick = await vscode.window.showQuickPick(
+        availableDates.map((d) => ({
+          label: d === today ? `📅 ${d} (今天)` : `📅 ${d}`,
+          description: d === today ? '当前工作日' : '历史归档记录',
+          dateStr: d,
+        })),
+        { placeHolder: '选择要查看的历史复盘日期与剪贴板归档' }
+      );
+
+      if (pick) {
+        await sidebarProvider.renderDate(pick.dateStr);
+        vscode.window.showInformationMessage(`LFAI: 已切换至 ${pick.dateStr} 复盘看板。`);
+      }
+    }
+  );
+  context.subscriptions.push(selectDateCommand);
+
+  // 17. Command: Generate Weekly Report
+  const generateWeeklyReportCommand = vscode.commands.registerCommand(
+    'lfai.generateWeeklyReport',
+    async () => {
+      const report = await ReportManager.generateWeeklyReport(context);
+      const action = await vscode.window.showInformationMessage(
+        `🎉 LFAI: 已成功汇总本周周报 (${report.startDate} ~ ${report.endDate})，包含 ${report.includedDates.length} 个工作日记录！`,
+        '📋 复制周报到剪贴板',
+        '📝 查看 Markdown 周报'
+      );
+      if (action === '📋 复制周报到剪贴板') {
+        await vscode.commands.executeCommand('lfai.copyWeeklyReport');
+      } else if (action === '📝 查看 Markdown 周报') {
+        await vscode.commands.executeCommand('lfai.openWeeklyReport');
+      }
+    }
+  );
+  context.subscriptions.push(generateWeeklyReportCommand);
+
+  // 18. Command: Copy Weekly Report
+  const copyWeeklyReportCommand = vscode.commands.registerCommand(
+    'lfai.copyWeeklyReport',
+    async () => {
+      const report = await ReportManager.generateWeeklyReport(context);
+      const text = ReportManager.formatReportForClipboard(report);
+      await vscode.env.clipboard.writeText(text);
+      vscode.window.showInformationMessage(`🎉 LFAI: 本周工作周报已复制到剪贴板，可直接发送！`);
+    }
+  );
+  context.subscriptions.push(copyWeeklyReportCommand);
+
+  // 19. Command: Open Weekly Report Note
+  const openWeeklyReportCommand = vscode.commands.registerCommand(
+    'lfai.openWeeklyReport',
+    async () => {
+      const report = await ReportManager.generateWeeklyReport(context);
+      const ok = await ReportManager.openReportDoc(report);
+      if (!ok) {
+        vscode.window.showWarningMessage('LFAI: 无法打开本周周报文档。');
+      }
+    }
+  );
+  context.subscriptions.push(openWeeklyReportCommand);
+
+  // 20. Command: Generate Monthly Report
+  const generateMonthlyReportCommand = vscode.commands.registerCommand(
+    'lfai.generateMonthlyReport',
+    async () => {
+      const report = await ReportManager.generateMonthlyReport(context);
+      const action = await vscode.window.showInformationMessage(
+        `🎉 LFAI: 已成功汇总本月月报 (${report.periodId})，包含 ${report.includedDates.length} 个工作日记录！`,
+        '📋 复制月报到剪贴板',
+        '📝 查看 Markdown 月报'
+      );
+      if (action === '📋 复制月报到剪贴板') {
+        await vscode.commands.executeCommand('lfai.copyMonthlyReport');
+      } else if (action === '📝 查看 Markdown 月报') {
+        await vscode.commands.executeCommand('lfai.openMonthlyReport');
+      }
+    }
+  );
+  context.subscriptions.push(generateMonthlyReportCommand);
+
+  // 21. Command: Copy Monthly Report
+  const copyMonthlyReportCommand = vscode.commands.registerCommand(
+    'lfai.copyMonthlyReport',
+    async () => {
+      const report = await ReportManager.generateMonthlyReport(context);
+      const text = ReportManager.formatReportForClipboard(report);
+      await vscode.env.clipboard.writeText(text);
+      vscode.window.showInformationMessage(`🎉 LFAI: 本月工作月报已复制到剪贴板，可直接发送！`);
+    }
+  );
+  context.subscriptions.push(copyMonthlyReportCommand);
+
+  // 22. Command: Open Monthly Report Note
+  const openMonthlyReportCommand = vscode.commands.registerCommand(
+    'lfai.openMonthlyReport',
+    async () => {
+      const report = await ReportManager.generateMonthlyReport(context);
+      const ok = await ReportManager.openReportDoc(report);
+      if (!ok) {
+        vscode.window.showWarningMessage('LFAI: 无法打开本月月报文档。');
+      }
+    }
+  );
+  context.subscriptions.push(openMonthlyReportCommand);
 }
 
 export function deactivate() {}

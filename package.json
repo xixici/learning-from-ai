@@ -2,7 +2,7 @@
   "name": "lfai",
   "displayName": "LFAI — Learning From AI",
   "description": "从每日代码变更与 AI 交互中提炼核心考点、架构权衡与自测卡片，告别 AI 时代技能空心化。",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "publisher": "xixici",
   "icon": "resources/icon.png",
   "repository": {
@@ -113,6 +113,48 @@
         "title": "查看 LLM 模型调用日志",
         "category": "LFAI",
         "icon": "$(output)"
+      },
+      {
+        "command": "lfai.selectDate",
+        "title": "选择历史日期查看复盘看板",
+        "category": "LFAI",
+        "icon": "$(calendar)"
+      },
+      {
+        "command": "lfai.generateWeeklyReport",
+        "title": "生成本周工作周报",
+        "category": "LFAI",
+        "icon": "$(graph)"
+      },
+      {
+        "command": "lfai.copyWeeklyReport",
+        "title": "复制本周工作周报到剪贴板",
+        "category": "LFAI",
+        "icon": "$(clippy)"
+      },
+      {
+        "command": "lfai.openWeeklyReport",
+        "title": "打开本周周报 Markdown 笔记",
+        "category": "LFAI",
+        "icon": "$(book)"
+      },
+      {
+        "command": "lfai.generateMonthlyReport",
+        "title": "生成本月工作月报",
+        "category": "LFAI",
+        "icon": "$(calendar)"
+      },
+      {
+        "command": "lfai.copyMonthlyReport",
+        "title": "复制本月工作月报到剪贴板",
+        "category": "LFAI",
+        "icon": "$(clippy)"
+      },
+      {
+        "command": "lfai.openMonthlyReport",
+        "title": "打开本月月报 Markdown 笔记",
+        "category": "LFAI",
+        "icon": "$(book)"
       }
     ],
     "menus": {

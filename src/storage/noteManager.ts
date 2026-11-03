@@ -10,10 +10,10 @@ export class NoteManager {
     context: vscode.ExtensionContext,
     digest: DailyDigest
   ): Promise<string | null> {
-    // 1. Cache to workspaceState
+    // 1. Cache to workspaceState (for latest/today)
     await context.workspaceState.update(this.STORAGE_KEY, digest);
 
-    // 2. Write to Markdown file
+    // 2. Write to Markdown file (.lfai/daily/YYYY-MM-DD.md)
     const workspaceFolders = vscode.workspace.workspaceFolders;
     if (!workspaceFolders || workspaceFolders.length === 0) {
       return null;
@@ -21,15 +21,125 @@ export class NoteManager {
 
     const config = vscode.workspace.getConfiguration('lfai');
     const relDir = config.get<string>('notesDir', '.lfai/daily');
-    const targetDir = path.join(workspaceFolders[0].uri.fsPath, relDir);
+    const dailyDir = path.join(workspaceFolders[0].uri.fsPath, relDir);
+    const rootDir = path.dirname(dailyDir);
+    const historyDir = path.join(rootDir, 'history');
 
-    await fs.mkdir(targetDir, { recursive: true });
+    await fs.mkdir(dailyDir, { recursive: true });
+    await fs.mkdir(historyDir, { recursive: true });
 
-    const filePath = path.join(targetDir, `${digest.date}.md`);
+    const filePath = path.join(dailyDir, `${digest.date}.md`);
     const mdContent = this.formatDigestToMarkdown(digest);
-
     await fs.writeFile(filePath, mdContent, 'utf-8');
+
+    // 3. Save structured JSON (.lfai/history/YYYY-MM-DD.json) for lossless historical retrieval
+    const jsonPath = path.join(historyDir, `${digest.date}.json`);
+    try {
+      await fs.writeFile(jsonPath, JSON.stringify(digest, null, 2), 'utf-8');
+    } catch (err) {
+      console.warn(`LFAI: Failed to write history json for ${digest.date}:`, err);
+    }
+
     return filePath;
+  }
+
+  /**
+   * Retrieve DailyDigest for any specific date
+   */
+  public static async getDigestByDate(
+    context: vscode.ExtensionContext,
+    targetDate: string
+  ): Promise<DailyDigest | null> {
+    // Check cached latest if date matches
+    const cached = this.getCachedDigest(context);
+    if (cached && cached.date === targetDate) {
+      return cached;
+    }
+
+    const workspaceFolders = vscode.workspace.workspaceFolders;
+    if (!workspaceFolders || workspaceFolders.length === 0) {
+      return null;
+    }
+
+    const config = vscode.workspace.getConfiguration('lfai');
+    const relDir = config.get<string>('notesDir', '.lfai/daily');
+    const rootDir = path.dirname(path.join(workspaceFolders[0].uri.fsPath, relDir));
+    const jsonPath = path.join(rootDir, 'history', `${targetDate}.json`);
+
+    try {
+      const raw = await fs.readFile(jsonPath, 'utf-8');
+      const parsed = JSON.parse(raw);
+      if (parsed && parsed.date === targetDate) {
+        return parsed;
+      }
+    } catch {
+      // File might not exist
+    }
+
+    return null;
+  }
+
+  /**
+   * Get list of all available historical dates with daily digests (newest first)
+   */
+  public static async getAllAvailableDates(): Promise<string[]> {
+    const datesSet = new Set<string>();
+    const workspaceFolders = vscode.workspace.workspaceFolders;
+    if (!workspaceFolders || workspaceFolders.length === 0) {
+      return [];
+    }
+
+    const config = vscode.workspace.getConfiguration('lfai');
+    const relDir = config.get<string>('notesDir', '.lfai/daily');
+    const dailyDir = path.join(workspaceFolders[0].uri.fsPath, relDir);
+    const rootDir = path.dirname(dailyDir);
+    const historyDir = path.join(rootDir, 'history');
+
+    // Check daily markdown files
+    try {
+      const dailyFiles = await fs.readdir(dailyDir);
+      for (const f of dailyFiles) {
+        const m = f.match(/^(\d{4}-\d{2}-\d{2})\.md$/);
+        if (m) {
+          datesSet.add(m[1]);
+        }
+      }
+    } catch {}
+
+    // Check history json files
+    try {
+      const historyFiles = await fs.readdir(historyDir);
+      for (const f of historyFiles) {
+        const m = f.match(/^(\d{4}-\d{2}-\d{2})\.json$/);
+        if (m) {
+          datesSet.add(m[1]);
+        }
+      }
+    } catch {}
+
+    return Array.from(datesSet).sort((a, b) => b.localeCompare(a));
+  }
+
+  public static async openNoteByDate(targetDate: string): Promise<boolean> {
+    const workspaceFolders = vscode.workspace.workspaceFolders;
+    if (!workspaceFolders || workspaceFolders.length === 0) {
+      vscode.window.showWarningMessage('LFAI: 请在打开的工作区中执行此操作。');
+      return false;
+    }
+
+    const config = vscode.workspace.getConfiguration('lfai');
+    const relDir = config.get<string>('notesDir', '.lfai/daily');
+    const filePath = path.join(workspaceFolders[0].uri.fsPath, relDir, `${targetDate}.md`);
+
+    try {
+      await fs.access(filePath);
+      const doc = await vscode.workspace.openTextDocument(filePath);
+      await vscode.window.showTextDocument(doc, { preview: false });
+      return true;
+    } catch {
+      vscode.window.showInformationMessage(`LFAI: 未找到 ${targetDate} 的 Markdown 笔记文件。`);
+      return false;
+    }
   }
 
   public static getCachedDigest(context: vscode.ExtensionContext): DailyDigest | undefined {
@@ -37,28 +147,8 @@ export class NoteManager {
   }
 
   public static async openTodayNote(): Promise<void> {
-    const workspaceFolders = vscode.workspace.workspaceFolders;
-    if (!workspaceFolders || workspaceFolders.length === 0) {
-      vscode.window.showWarningMessage('LFAI: 请在打开的工作区中执行此操作。');
-      return;
-    }
-
     const today = new Date().toISOString().split('T')[0];
-    const config = vscode.workspace.getConfiguration('lfai');
-    const relDir = config.get<string>('notesDir', '.lfai/daily');
-    const filePath = path.join(workspaceFolders[0].uri.fsPath, relDir, `${today}.md`);
-
-    try {
-      await fs.access(filePath);
-    } catch {
-      vscode.window.showInformationMessage(
-        `LFAI: 今日笔记尚未生成，请先点击「提炼今日代码与 AI 考点」。`
-      );
-      return;
-    }
-
-    const doc = await vscode.workspace.openTextDocument(filePath);
-    await vscode.window.showTextDocument(doc, { preview: false });
+    await this.openNoteByDate(today);
   }
 
   public static formatWorkSummaryForClipboard(digest: DailyDigest): string {

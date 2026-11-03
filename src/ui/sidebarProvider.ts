@@ -3,9 +3,12 @@ import { DailyDigest, InboxItem } from '../types';
 import { NoteManager } from '../storage/noteManager';
 import { InboxManager } from '../storage/inboxManager';
 import { ClipboardWatcher } from '../collector/clipboardWatcher';
+import { ReportManager } from '../storage/reportManager';
+
 export class LFAISidebarProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'lfai.sidebarView';
   private _view?: vscode.WebviewView;
+  private _selectedDate: string = InboxManager.formatLocalDate();
 
   constructor(private readonly _context: vscode.ExtensionContext) {
     _context.subscriptions.push(
@@ -14,7 +17,6 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
       })
     );
   }
-
   public resolveWebviewView(
     webviewView: vscode.WebviewView,
     _context: vscode.WebviewViewResolveContext,
@@ -35,7 +37,40 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
           await vscode.commands.executeCommand('lfai.extractTodayLearnings');
           break;
         case 'openNote':
-          await vscode.commands.executeCommand('lfai.openTodayNote');
+          await NoteManager.openNoteByDate(this._selectedDate);
+          break;
+        case 'changeDate':
+          if (data.date) {
+            this._selectedDate = data.date;
+            await this.renderWebview(this._selectedDate);
+          }
+          break;
+        case 'generateWeeklyReport': {
+          const refDate = new Date(this._selectedDate || Date.now());
+          const report = await ReportManager.generateWeeklyReport(this._context, refDate);
+          this._view?.webview.postMessage({ type: 'showReport', report });
+          break;
+        }
+        case 'generateMonthlyReport': {
+          const refDate = new Date(this._selectedDate || Date.now());
+          const report = await ReportManager.generateMonthlyReport(this._context, refDate);
+          this._view?.webview.postMessage({ type: 'showReport', report });
+          break;
+        }
+        case 'copyReport':
+          if (data.report) {
+            const text = ReportManager.formatReportForClipboard(data.report);
+            await vscode.env.clipboard.writeText(text);
+            vscode.window.showInformationMessage(`🎉 LFAI: ${data.report.title} 已复制到剪贴板！`);
+          }
+          break;
+        case 'openReportDoc':
+          if (data.report) {
+            const ok = await ReportManager.openReportDoc(data.report);
+            if (!ok) {
+              vscode.window.showWarningMessage('LFAI: 无法打开报告 Markdown 文档。');
+            }
+          }
           break;
         case 'copyStandup':
           await vscode.commands.executeCommand('lfai.copyDailyStandup');
@@ -81,21 +116,48 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
 
   public updateDigest(digest: DailyDigest): void {
     if (this._view) {
-      this._view.webview.postMessage({ type: 'updateDigest', digest });
+      if (!this._selectedDate || this._selectedDate === digest.date) {
+        this._view.webview.postMessage({ type: 'updateDigest', digest });
+      } else {
+        this.renderWebview();
+      }
     }
   }
-
   public refresh(): void {
     this.renderWebview();
   }
 
-  private async renderWebview(): Promise<void> {
+  public async renderDate(date: string): Promise<void> {
+    await this.renderWebview(date);
+  }
+
+  private async renderWebview(date?: string): Promise<void> {
     if (!this._view) {
       return;
     }
 
-    const digest = NoteManager.getCachedDigest(this._context);
-    const inboxItems = await InboxManager.getItems(this._context);
+    if (date) {
+      this._selectedDate = date;
+    } else if (!this._selectedDate) {
+      this._selectedDate = InboxManager.formatLocalDate();
+    }
+
+    const todayStr = InboxManager.formatLocalDate();
+    const isToday = this._selectedDate === todayStr;
+
+    // Get digest for selected date
+    let digest: DailyDigest | null = null;
+    if (isToday) {
+      digest = NoteManager.getCachedDigest(this._context) || (await NoteManager.getDigestByDate(this._context, todayStr));
+    } else {
+      digest = await NoteManager.getDigestByDate(this._context, this._selectedDate);
+    }
+
+    // Get inbox items for selected date (active items if today, date-archived if history)
+    const inboxItems = isToday
+      ? await InboxManager.getItems(this._context)
+      : await InboxManager.getItemsByDate(this._context, this._selectedDate);
+
     const watcher = ClipboardWatcher.getInstance(this._context);
     const watcherInfo = {
       isRunning: watcher.isRunning,
@@ -104,27 +166,32 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
       lastCapturedPreview: watcher.lastCapturedPreview,
     };
 
-    this._view.webview.html = this.getHtmlForWebview(digest, inboxItems, watcherInfo);
+    this._view.webview.html = this.getHtmlForWebview(
+      digest,
+      inboxItems,
+      watcherInfo,
+      this._selectedDate,
+      todayStr
+    );
   }
 
   private getHtmlForWebview(
-    digest?: DailyDigest,
+    digest?: DailyDigest | null,
     inboxItems: InboxItem[] = [],
     watcherInfo: { isRunning: boolean; lastCheckTime: number; lastCapturedTime: number; lastCapturedPreview?: string } = {
       isRunning: true,
       lastCheckTime: 0,
       lastCapturedTime: 0,
-    }
+    },
+    selectedDate: string = InboxManager.formatLocalDate(),
+    todayStr: string = InboxManager.formatLocalDate()
   ): string {
-    const todayStr = new Date().toISOString().split('T')[0];
+    const cardsJson = JSON.stringify(digest?.cards || []).replace(/</g, '\\u003c');
     const inboxItemsJson = JSON.stringify(inboxItems).replace(/</g, '\\u003c');
     const watcherInfoJson = JSON.stringify(watcherInfo).replace(/</g, '\\u003c');
-
-    const cardsJson = JSON.stringify(digest?.cards || []).replace(/</g, '\\u003c');
     const workSummaryJson = JSON.stringify(digest?.workSummary || null).replace(/</g, '\\u003c');
     const summaryText = digest?.summary || '暂无提炼数据，点击下方按钮开始分析今日代码。';
     const totalCount = digest?.cards?.length || 0;
-
     return `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -660,22 +727,183 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
       font-size: 11px;
       cursor: pointer;
     }
+    /* Date Navigator */
+    .date-nav-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .date-nav-btn {
+      padding: 3px 6px;
+      font-size: 11px;
+      background: var(--vscode-editor-background);
+      border: 1px solid var(--card-border);
+      color: var(--fg);
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .date-nav-btn:hover {
+      background: var(--vscode-list-hoverBackground);
+    }
+    .date-picker-box {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .date-input {
+      background: var(--vscode-input-background);
+      color: var(--vscode-input-foreground);
+      border: 1px solid var(--vscode-input-border, var(--card-border));
+      border-radius: 3px;
+      padding: 2px 4px;
+      font-size: 11px;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    .date-today-btn {
+      padding: 2px 6px;
+      font-size: 10px;
+      background: var(--accent);
+      color: var(--accent-fg);
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    .periodic-actions-row {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .report-btn {
+      flex: 1;
+      padding: 5px 8px;
+      font-size: 11px;
+      background: rgba(86, 156, 214, 0.15);
+      border: 1px solid rgba(86, 156, 214, 0.4);
+      color: #9cdcfe;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+    .report-btn:hover {
+      background: rgba(86, 156, 214, 0.25);
+    }
+    /* Report Modal */
+    .report-modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.65);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 12px;
+    }
+    .report-modal-content {
+      background: var(--card-bg);
+      border: 1px solid var(--accent);
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      max-height: 85vh;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      overflow: hidden;
+    }
+    .report-modal-header {
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(0, 122, 204, 0.15);
+      border-bottom: 1px solid var(--card-border);
+      font-weight: 600;
+      font-size: 12px;
+    }
+    .btn-close-modal {
+      background: transparent;
+      border: none;
+      color: var(--fg);
+      font-size: 14px;
+      cursor: pointer;
+      padding: 0 4px;
+    }
+    .report-modal-overview {
+      padding: 6px 12px;
+      font-size: 11px;
+      color: var(--accent);
+      background: rgba(0, 122, 204, 0.05);
+      border-bottom: 1px solid var(--card-border);
+    }
+    .report-modal-body {
+      padding: 10px 12px;
+      overflow-y: auto;
+      font-size: 11px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      font-family: inherit;
+      background: var(--vscode-editor-background);
+      flex: 1;
+    }
+    .report-modal-actions {
+      padding: 8px 12px;
+      display: flex;
+      gap: 6px;
+      border-top: 1px solid var(--card-border);
+      background: var(--card-bg);
+    }
   </style>
 </head>
 <body>
   <div class="header-box">
+    <div class="date-nav-bar">
+      <button class="date-nav-btn" id="btnPrevDay" title="查看前一天">◀ 前一天</button>
+      <div class="date-picker-box">
+        <input type="date" id="datePickerInput" class="date-input" value="${selectedDate}">
+        ${selectedDate !== todayStr ? '<button class="date-today-btn" id="btnGoToday">今天</button>' : ''}
+      </div>
+      <button class="date-nav-btn" id="btnNextDay" title="查看后一天">后一天 ▶</button>
+    </div>
+
     <div class="title-row">
-      <span class="title-main">🧠 LFAI 学习与交付</span>
-      <span class="date-badge">${todayStr} (${totalCount} 张卡片)</span>
+      <span class="title-main">🧠 LFAI ${selectedDate === todayStr ? '今日复盘' : selectedDate + ' 历史归档'}</span>
+      <span class="date-badge">${selectedDate} (${totalCount} 张卡片)</span>
     </div>
     <div class="summary-text" id="summaryBox">${summaryText}</div>
     <div class="actions-grid">
-      <button id="btnExtract">⚡ 提炼今日考点</button>
+      <button id="btnExtract">⚡ ${selectedDate === todayStr ? '提炼今日考点' : '分析当前代码'}</button>
       <button class="secondary" id="btnStandup">📋 复制日报/PR</button>
     </div>
     <div style="display: flex; gap: 6px; margin-top: 6px;">
       <button class="secondary" style="flex: 1;" id="btnCapture">📥 捕获剪贴板</button>
-      <button class="secondary" style="flex: 2;" id="btnNote">📝 打开 Markdown 复盘笔记</button>
+      <button class="secondary" style="flex: 2;" id="btnNote">📝 打开此日期 Markdown 笔记</button>
+    </div>
+    <div class="periodic-actions-row">
+      <button class="report-btn" id="btnWeeklyReport">📊 生成本周周报</button>
+      <button class="report-btn" id="btnMonthlyReport">📅 生成本月月报</button>
+    </div>
+  </div>
+
+  <!-- 周期汇报展示弹窗 -->
+  <div id="reportModal" class="report-modal" style="display: none;">
+    <div class="report-modal-content">
+      <div class="report-modal-header">
+        <span id="reportModalTitle">📊 周期汇报总结</span>
+        <button id="btnCloseReportModal" class="btn-close-modal">✕</button>
+      </div>
+      <div class="report-modal-overview" id="reportModalOverview"></div>
+      <pre class="report-modal-body" id="reportModalBody"></pre>
+      <div class="report-modal-actions">
+        <button id="btnCopyReport" style="flex: 1;">📋 复制此汇报到剪贴板</button>
+        <button id="btnOpenReportDoc" style="flex: 1;" class="secondary">📝 查看 Markdown 报告</button>
+      </div>
     </div>
   </div>
 
@@ -732,6 +960,63 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
     let watcherData = ${watcherInfoJson};
     let currentFilter = 'all';
     let isInboxCollapsed = false;
+    let currentSelectedDate = '${selectedDate}';
+    let currentReportData = null;
+
+    function shiftDate(offsetDays) {
+      const parts = currentSelectedDate.split('-').map(Number);
+      const d = new Date(parts[0], parts[1] - 1, parts[2]);
+      d.setDate(d.getDate() + offsetDays);
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      const target = y + '-' + m + '-' + day;
+      vscode.postMessage({ type: 'changeDate', date: target });
+    }
+
+    const btnPrevDay = document.getElementById('btnPrevDay');
+    if (btnPrevDay) {
+      btnPrevDay.addEventListener('click', () => shiftDate(-1));
+    }
+    const btnNextDay = document.getElementById('btnNextDay');
+    if (btnNextDay) {
+      btnNextDay.addEventListener('click', () => shiftDate(1));
+    }
+    const btnGoToday = document.getElementById('btnGoToday');
+    if (btnGoToday) {
+      btnGoToday.addEventListener('click', () => {
+        vscode.postMessage({ type: 'changeDate', date: '${todayStr}' });
+      });
+    }
+    const datePickerInput = document.getElementById('datePickerInput');
+    if (datePickerInput) {
+      datePickerInput.addEventListener('change', (e) => {
+        if (e.target.value) {
+          vscode.postMessage({ type: 'changeDate', date: e.target.value });
+        }
+      });
+    }
+
+    document.getElementById('btnWeeklyReport').addEventListener('click', () => {
+      vscode.postMessage({ type: 'generateWeeklyReport' });
+    });
+    document.getElementById('btnMonthlyReport').addEventListener('click', () => {
+      vscode.postMessage({ type: 'generateMonthlyReport' });
+    });
+    document.getElementById('btnCloseReportModal').addEventListener('click', () => {
+      document.getElementById('reportModal').style.display = 'none';
+    });
+    document.getElementById('btnCopyReport').addEventListener('click', () => {
+      if (currentReportData) {
+        vscode.postMessage({ type: 'copyReport', report: currentReportData });
+      }
+    });
+    document.getElementById('btnOpenReportDoc').addEventListener('click', () => {
+      if (currentReportData) {
+        vscode.postMessage({ type: 'openReportDoc', report: currentReportData });
+      }
+    });
+
     document.getElementById('btnExtract').addEventListener('click', () => {
       vscode.postMessage({ type: 'extractToday' });
     });
@@ -743,7 +1028,6 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
     document.getElementById('btnNote').addEventListener('click', () => {
       vscode.postMessage({ type: 'openNote' });
     });
-
     document.getElementById('btnCapture').addEventListener('click', () => {
       vscode.postMessage({ type: 'captureClipboard' });
     });
@@ -794,6 +1078,13 @@ export class LFAISidebarProvider implements vscode.WebviewViewProvider {
         document.getElementById('summaryBox').innerText = msg.digest.summary || '提炼完成';
         renderWorkSummary();
         renderCards();
+      }
+      if (msg.type === 'showReport' && msg.report) {
+        currentReportData = msg.report;
+        document.getElementById('reportModalTitle').innerText = msg.report.title || '周期汇报预览';
+        document.getElementById('reportModalOverview').innerText = msg.report.overview || '';
+        document.getElementById('reportModalBody').innerText = msg.report.dailyReportText || '';
+        document.getElementById('reportModal').style.display = 'flex';
       }
       if (msg.type === 'updateInbox' && msg.items) {
         inboxData = msg.items;
